@@ -11,7 +11,23 @@
 @implementation Message
 
 @synthesize senderName, messageBody, read, subject, messageID;
-@synthesize contactArray;
+@synthesize contacts, senderID;
+
+-(id)initWithMessageDictionary:(NSDictionary *)messageDictionary
+{
+    
+    if ((self = [super init]))
+    {
+        self.messageID = [[messageDictionary objectForKey:@"MessageId"] intValue];
+        self.contacts = [messageDictionary objectForKey:@"Contacts"];
+        self.senderName = [messageDictionary objectForKey:@"SenderName"];
+        self.senderID = [[messageDictionary objectForKey:@"SenderId"] intValue];
+        self.subject = [messageDictionary objectForKey:@"Subject"];
+        self.messageBody = [messageDictionary objectForKey:@"MessageBody"];
+    }
+    return self;
+
+}
 
 
 

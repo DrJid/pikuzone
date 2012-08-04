@@ -13,7 +13,8 @@
 #import "Message.h"
 #import "EmailDetailViewController.h"
 #import <Three20UI/UIViewAdditions.h>
-#import "Recipient.h"
+#import "Contact.h"
+#import "PikuZoneAPIClient.h"
 
 
 #define kSenderLabel 1001
@@ -22,13 +23,13 @@
 
 
 @implementation InboxViewController
-@synthesize username;
 @synthesize theTableView;
 @synthesize cellIdentifier;
 @synthesize sendTimer = _sendTimer;
 @synthesize mainMessageController;
 @synthesize emailArray;
 @synthesize statusLabel;
+@synthesize contactArray;
 
 
 #pragma mark - Custom Inbox Methods
@@ -169,36 +170,86 @@
     
     
     
-    //Create Email Test Data! 
-    Message *email1 = [[Message alloc] init];
-    email1.senderName = @"Steve";
-    email1.subject = @"How was the exam?";
-    email1.messageBody = @"I hope it was all okay. Did you remember Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-    
-    Message *email2 = [[Message alloc] init];
-    email2.senderName = @"Young Grandma";
-    email2.subject = @"I found your toy!";
-    email2.messageBody = @"It was in the shower.";
-    
-    Message *email3 = [[Message alloc] init];
-    email3.senderName = @"Cousin Mary";
-    email3.subject = @"Medium Sized Message";
-    email3.messageBody = @"I forgot the name but... Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora";
-    
-    Message *email4 = [[Message alloc] init];
-    email4.senderName = @"Cynthia";
-    email4.subject = @"Who is Cicero?";
-    email4.messageBody = @"But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to";
-    
-    Message *email5 = [[Message alloc] init];
-    email5.senderName = @"Maijid";
-    email5.subject = @"PikuZone Progress";
-    email5.messageBody = @"But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to";
-    
-    self.emailArray = [NSMutableArray arrayWithObjects:email1, email2, email3, email4,  email5, nil ];
+//    //Create Email Test Data! 
+//    Message *email1 = [[Message alloc] init];
+//    email1.senderName = @"Steve";
+//    email1.subject = @"How was the exam?";
+//    email1.messageBody = @"I hope it was all okay. Did you remember Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+//    
+//    Message *email2 = [[Message alloc] init];
+//    email2.senderName = @"Young Grandma";
+//    email2.subject = @"I found your toy!";
+//    email2.messageBody = @"It was in the shower.";
+//    
+//    Message *email3 = [[Message alloc] init];
+//    email3.senderName = @"Cousin Mary";
+//    email3.subject = @"Medium Sized Message";
+//    email3.messageBody = @"I forgot the name but... Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora";
+//    
+//    Message *email4 = [[Message alloc] init];
+//    email4.senderName = @"Cynthia";
+//    email4.subject = @"Who is Cicero?";
+//    email4.messageBody = @"But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to";
+//    
+//    Message *email5 = [[Message alloc] init];
+//    email5.senderName = @"Maijid";
+//    email5.subject = @"PikuZone Progress";
+//    email5.messageBody = @"But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to";
+//    
+//    self.emailArray = [NSMutableArray arrayWithObjects:email1, email2, email3, email4,  email5, nil ];
+    self.emailArray = [NSMutableArray arrayWithCapacity:5];
+    self.contactArray = [NSMutableArray arrayWithCapacity:5];
     
     //We can download the user's contacts and stuff with a method in here. It should do it on a different thread obviously.
     //getContacts(user.sessionTokenString) sends post and recieve an array of Contact Objects.
+    
+    NSDictionary *params = [NSDictionary dictionaryWithObject:self.currentUser.sessionToken forKey:@"sessionToken"];
+    
+    [[PikuZoneAPIClient sharedInstance] postPath:@"GetMessages.ashx"
+                                      parameters:params
+                                         success:^(AFHTTPRequestOperation *operation, id responseObject) {
+                                             //success
+                                             
+                                             //if status == 1 don't forget to check NTS. 
+                                             NSDictionary *completeMessageDict = [responseObject objectForKey:@"Messages"];
+//                                             NSLog(@"Count: %i", completeMessageDict.count);
+                                             
+                                             for (NSDictionary *singleMessageDict in completeMessageDict) {
+                                                 Message *message = [[Message alloc] initWithMessageDictionary:singleMessageDict];
+//                                                 NSLog(@"single: %@", singleMessageDict);
+                                                 
+                                                 [self.emailArray addObject:message];
+                                             }
+                                             
+//                                             NSLog(@"response: %@", completeMessageDict);
+                                             [theTableView reloadData];
+                                         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+                                             //failure
+                                             NSLog(@"%@", [error localizedDescription]);
+                                             
+                                         }];
+    
+    
+    [[PikuZoneAPIClient sharedInstance] postPath:@"GetContacts.ashx" parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        //success
+        
+        //if status == 1 make sure you check
+        NSDictionary *completeContactDict = [responseObject objectForKey:@"Contacts"];
+        
+        for (NSDictionary *singleContactDict in completeContactDict) {
+            Contact *contact = [[Contact alloc] initWithContactDictionary:singleContactDict];
+            
+            [self.contactArray addObject:contact];
+        }
+        
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        //failure
+        NSLog(@"%@", [error localizedDescription]);
+        
+    }];
+    
+    NSLog(@"self.contactarray %@", self.contactArray);
+    
     
 }
 
@@ -444,7 +495,7 @@
     for (NSString *name in toField.recipients) {
         
         //Get the actual recipient class: 
-        Recipient *recipient = [rvc getRecipientForName:name];
+        Contact *recipient = [rvc getRecipientForName:name];
         NSLog(@"Name: %@, Email: %@", recipient.name, recipient.email);
         
     }
@@ -486,10 +537,9 @@
     //    [alert show];
     
     
-    RecipientViewController *recipientController = [[RecipientViewController alloc] init];
+    RecipientViewController *recipientController = [[RecipientViewController alloc] initWithStyle:UITableViewStylePlain contacts:self.contactArray];
     
     //Here we use the contact array we got from the GetContacts method and send it to the recipientsController. And will be used as the datasource. 
-//    recipientController.contactArray = xyz
     
     
     recipientController.delegate = self;
@@ -520,7 +570,7 @@
 
 
 #pragma mark - Recipient View Controller Delegate
-- (void)recipientViewController:(RecipientViewController*)controller didSelectRecipient:(Recipient *)recipient {
+- (void)recipientViewController:(RecipientViewController*)controller didSelectRecipient:(Contact *)recipient {
     NSLog(@"Selected %@ email address: %@", recipient.name, recipient.email);    
     
 //    TTMessageController* composeController = (TTMessageController*)controller;//controller.navigationController ;// self.navigationController.topViewController ;

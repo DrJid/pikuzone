@@ -29,8 +29,7 @@
     
     if (self) {
         //custom settings
-        [self setDefaultHeader:@"x-api-token" value:PikuZoneAPIToken];
-        
+        [self setDefaultHeader:@"Accept" value:@"application/json"];
         [self registerHTTPOperationClass:[AFJSONRequestOperation class]];
     }
     return self;

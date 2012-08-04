@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Recipient.h"
+#import "Contact.h"
+
 
 
 @protocol RecipientViewControllerDelegate;
@@ -18,16 +19,20 @@
     id<RecipientViewControllerDelegate>delegate;
 }
 
-- (Recipient *)getRecipientForName:(NSString *)name;
+- (Contact *)getRecipientForName:(NSString *)name;
 
 @property(nonatomic, assign) id<RecipientViewControllerDelegate>delegate;
 
-@property(nonatomic, strong) NSMutableArray *recipientArray;
+@property(nonatomic, strong) NSMutableArray *contactArray;
+
+
+- (id)initWithStyle:(UITableViewStyle)style contacts:(NSMutableArray *)contactArray;
+
 
 @end
 
 @protocol  RecipientViewControllerDelegate <NSObject>
-- (void)recipientViewController:(RecipientViewController*)controller didSelectRecipient:(Recipient *)recipient;
+- (void)recipientViewController:(RecipientViewController*)controller didSelectRecipient:(Contact *)recipient;
 - (void)recipientViewControllerdidCancel:(RecipientViewController*)controller;
 @end
 

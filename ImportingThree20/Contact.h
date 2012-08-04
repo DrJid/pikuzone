@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface Recipient : NSObject
+@interface Contact : NSObject
 
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, copy) NSString *email; 
@@ -18,5 +18,6 @@
 
 
 -(id)initWithname:(NSString *)rname email:(NSString *)remail image:(UIImage *)image;
+-(id)initWithContactDictionary:(NSDictionary *)contactDictionary;
 
 @end

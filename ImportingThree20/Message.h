@@ -11,10 +11,14 @@
 @interface Message : NSObject
 
 @property (nonatomic, copy) NSString *senderName;
+@property int senderID;
 @property (nonatomic, copy) NSString *subject;
 @property (nonatomic, copy) NSString *messageBody;
 @property (nonatomic) int messageID;
-@property (nonatomic, strong) NSArray *contactArray;
+@property (nonatomic, strong) NSArray *contacts;
 @property BOOL read;
+
+
+-(id)initWithMessageDictionary:(NSDictionary *)messageDictionary;
 
 @end

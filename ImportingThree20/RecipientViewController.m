@@ -7,10 +7,11 @@
 //
 
 #import "RecipientViewController.h"
+#import "PikuZoneAPIClient.h"
 
 @implementation RecipientViewController
 @synthesize delegate =_delegate;
-@synthesize recipientArray;
+@synthesize contactArray;
 
 
 
@@ -22,6 +23,21 @@
     if (self) {
         // Custom initialization
         self.title = @"Family Book";
+        
+        
+    }
+    return self;
+}
+
+- (id)initWithStyle:(UITableViewStyle)style contacts:(NSMutableArray *)contactsArray
+{
+    if ((self = [super initWithStyle:style]))
+    {
+        self.title = @"FamilyBook";
+        self.contactArray = [[NSMutableArray alloc] initWithCapacity:5];
+        self.contactArray = contactsArray;
+        NSLog(@"ContactArray in init: %@", self.contactArray);
+//        self.contactArray = [[NSMutableArray alloc] initWithArray:contactsArray];
         
     }
     return self;
@@ -35,10 +51,10 @@
     // Release any cached data, images, etc that aren't in use.
 }
 
-- (Recipient *)getRecipientForName:(NSString *)name {
+- (Contact *)getRecipientForName:(NSString *)name {
     [self viewDidLoad];
     
-    for (Recipient *r in self.recipientArray) {
+    for (Contact *r in self.contactArray) {
         if ([r.name isEqualToString:name]) {
             return r;
         }
@@ -59,22 +75,24 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelsend)];
     
     //Create Recipient Test Data. 
-    Recipient *bill = [[Recipient alloc] initWithname:@"Bill" email:@"bill@msft.com" image:[UIImage imageNamed:@"avatar1.png"]];
+    Contact *bill = [[Contact alloc] initWithname:@"Bill" email:@"bill@msft.com" image:[UIImage imageNamed:@"avatar1.png"]];
 
-    Recipient *mary = [[Recipient alloc] initWithname:@"Cousin Mary" email:@"mary@scdsm.com" image:[UIImage imageNamed:@"avatar5.png"]];
+    Contact *mary = [[Contact alloc] initWithname:@"Cousin Mary" email:@"mary@scdsm.com" image:[UIImage imageNamed:@"avatar5.png"]];
     
-    Recipient *jo = [[Recipient alloc] initWithname:@"Cynthia" email:@"joe@joe.com" image:[UIImage imageNamed:@"avatar3.png"]];
+    Contact *jo = [[Contact alloc] initWithname:@"Cynthia" email:@"joe@joe.com" image:[UIImage imageNamed:@"avatar3.png"]];
     
-    Recipient *grandma = [[Recipient alloc] initWithname:@"Young Grandma" email:@"grandma@scdsm.com" image:[UIImage imageNamed:@"avatar4.png"]];
+    Contact *grandma = [[Contact alloc] initWithname:@"Young Grandma" email:@"grandma@scdsm.com" image:[UIImage imageNamed:@"avatar4.png"]];
     
-    Recipient *maijid = [[Recipient alloc] initWithname:@"Maijid" email:@"maijid@gmail.com" image:[UIImage imageNamed:@"maijid.jpeg"]];
+    Contact *maijid = [[Contact alloc] initWithname:@"Maijid" email:@"maijid@gmail.com" image:[UIImage imageNamed:@"maijid.jpeg"]];
     
-    Recipient *steve = [[Recipient alloc] initWithname:@"Steve" email:@"steve@papasite.com" image:[UIImage imageNamed:@"avatar2.png"]];
+    Contact *steve = [[Contact alloc] initWithname:@"Steve" email:@"steve@papasite.com" image:[UIImage imageNamed:@"avatar2.png"]];
+
 
     
+
     
-    
-    self.recipientArray = [NSMutableArray arrayWithObjects:bill, mary, jo, grandma, maijid, steve, nil];
+//    self.contactArray = [NSMutableArray arrayWithObjects:bill, mary, jo, grandma, maijid, steve, nil];
+    NSLog(@"ContactArray: %@", self.contactArray);
     
     
 }
@@ -127,7 +145,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    return self.recipientArray.count;
+    return self.contactArray.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -140,7 +158,7 @@
     }
     
     // Configure the cell...
-    Recipient *recipient = [self.recipientArray objectAtIndex:indexPath.row];
+    Contact *recipient = [self.contactArray objectAtIndex:indexPath.row];
     cell.textLabel.text = recipient.name;
     cell.imageView.image = recipient.recipientImage;
     
@@ -206,7 +224,7 @@
     
     //Get the object selected
     
-    Recipient *recipient = [self.recipientArray objectAtIndex:indexPath.row];
+    Contact *recipient = [self.contactArray objectAtIndex:indexPath.row];
     
     [self.delegate recipientViewController:self didSelectRecipient:recipient];
 }

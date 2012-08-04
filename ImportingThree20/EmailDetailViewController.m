@@ -403,7 +403,7 @@
     for (NSString *name in toField.recipients) {
         
         //Get the actual recipient class: 
-        Recipient *recipient = [rvc getRecipientForName:name];
+        Contact *recipient = [rvc getRecipientForName:name];
         NSLog(@"Name: %@, Email: %@", recipient.name, recipient.email);
         
     }
@@ -489,7 +489,7 @@
 //}
 
 
-- (void)recipientViewController:(RecipientViewController*)controller didSelectRecipient:(Recipient *)recipient {
+- (void)recipientViewController:(RecipientViewController*)controller didSelectRecipient:(Contact *)recipient {
     NSLog(@"Selected %@ email address: %@", recipient.name, recipient.email);    
     
     //    TTMessageController* composeController = (TTMessageController*)controller;//controller.navigationController ;// self.navigationController.topViewController ;
