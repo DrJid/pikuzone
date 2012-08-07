@@ -26,6 +26,9 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     
+    [[UINavigationBar appearance] setTintColor:[UIColor colorWithRed:0 green:100/255.f blue:0 alpha:1.0]];
+    [[UIToolbar appearance] setTintColor:[UIColor colorWithRed:0 green:100/255.f blue:0 alpha:1.0]];
+
 //    NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
 
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -52,14 +55,7 @@
         self.viewController = navController;
         self.window.rootViewController = self.viewController;
     } else {
-        LoginViewController *loginViewController = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
-
-        // Go to the welcome screen and have them log in or create an account.
-    	UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:loginViewController];
-        loginViewController.title = @"Welcome to PikuZone";
-                
-        self.viewController = navController;
-        self.window.rootViewController = self.viewController;
+        [self presentLoginViewController];
     }
     
     
@@ -67,6 +63,18 @@
     [self.window makeKeyAndVisible];
     return YES;
 
+}
+
+- (void)presentLoginViewController
+{
+    LoginViewController *loginViewController = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
+    
+    // Go to the welcome screen and have them log in or create an account.
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:loginViewController];
+    loginViewController.title = @"Welcome to PikuZone";
+    
+    self.viewController = navController;
+    self.window.rootViewController = self.viewController;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

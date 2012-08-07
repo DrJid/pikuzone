@@ -304,6 +304,7 @@
     
     
     TTMessageController* controller = [[TTMessageController alloc] initWithRecipients:recipients];
+    controller.navigationBarTintColor = [UIColor colorWithRed:0 green:100/255.f blue:0 alpha:1.0];
     controller.dataSource = [[MockSearchDataSource alloc] init];
     controller.delegate = self;
     controller.showsRecipientPicker = YES;

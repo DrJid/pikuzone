@@ -146,6 +146,20 @@
 
 - (void)viewDidLoad
 {
+    self.view.backgroundColor = [UIColor colorWithRed:240/255.f green:241/255.f blue:206/255.f alpha:1];
+    
+//    //Resign First Responder
+//    UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self.usernameField action:@selector(resignFirstResponder)];
+//    UITapGestureRecognizer *gestureRecognizer2 = [[UITapGestureRecognizer alloc] initWithTarget:self.passwordField action:@selector(resignFirstResponder)];
+//    
+    
+    //Why do we need this again? tto make it possible tap on anything else in teh screen. Otherwise it wouldn't really recognize the tap of the other buttons!!! This might be the reason why some of your button don't do what they are supposed to do after adding a gesture recognizer onto the view. Rmember!!!
+//    gestureRecognizer.cancelsTouchesInView = NO;
+//    gestureRecognizer2.cancelsTouchesInView = NO;
+//    [self.view addGestureRecognizer:gestureRecognizer];
+//    [self.view addGestureRecognizer:gestureRecognizer2];
+//
+//    [self.view endEditing:YES];
     [usernameField becomeFirstResponder];
 
     [super viewDidLoad];
@@ -160,8 +174,8 @@
     NSString *email = [[NSUserDefaults standardUserDefaults] objectForKey:@"emailAddress"];
     NSString *st = [[NSUserDefaults standardUserDefaults] objectForKey:@"sessionToken"];
     NSString *msg = [NSString stringWithFormat:@" %@ %@ %@", name, email, st];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Test Alert" message:msg delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
-    [alert show];
+//    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Test Alert" message:msg delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
+//    [alert show];
 }
 
 - (void)viewDidUnload
@@ -178,6 +192,13 @@
     // Return YES for supported orientations
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
+}
+
+
 
 
 @end

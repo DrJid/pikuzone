@@ -19,7 +19,7 @@
 @property (strong, nonatomic) UIViewController *viewController;
 
 
-- (void)presentLoginViewControllerThroughRootViewController;
+- (void)presentLoginViewController;
 
 
 @end

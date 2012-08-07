@@ -14,7 +14,7 @@
 #import "User.h"
 #import "BarButtonMethods.h"
 
-@interface InboxViewController : UIViewController <TTMessageControllerDelegate, RecipientViewControllerDelegate>
+@interface InboxViewController : UIViewController <TTMessageControllerDelegate, RecipientViewControllerDelegate, UIAlertViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *theTableView;
 @property (nonatomic, strong) NSString *cellIdentifier;

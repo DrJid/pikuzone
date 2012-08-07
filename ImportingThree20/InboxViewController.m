@@ -15,6 +15,7 @@
 #import <Three20UI/UIViewAdditions.h>
 #import "Contact.h"
 #import "PikuZoneAPIClient.h"
+#import "AppDelegate.h"
 
 
 #define kSenderLabel 1001
@@ -67,45 +68,54 @@
                                          success:^(AFHTTPRequestOperation *operation, id responseObject) {
                                              //success
                                              
-                                             //if status == 1 don't forget to check NTS.
-                                             NSDictionary *completeMessageDict = [responseObject objectForKey:@"Messages"];
-                                             
-                                             
-                                             for (NSDictionary *singleMessageDict in completeMessageDict) {
-                                                 Message *message = [[Message alloc] initWithMessageDictionary:singleMessageDict];
-                                                 BOOL found = NO;
-                                                 for (Message *currentMessage in self.emailArray)
-                                                 {
-                                                     if (currentMessage.messageID == message.messageID)
+                                             if ([[responseObject objectForKey:@"Status"] intValue] == 1)  //Connection successful
+                                             {
+                                                 NSDictionary *completeMessageDict = [responseObject objectForKey:@"Messages"];
+                                                 
+                                                 
+                                                 for (NSDictionary *singleMessageDict in completeMessageDict) {
+                                                     Message *message = [[Message alloc] initWithMessageDictionary:singleMessageDict];
+                                                     BOOL found = NO;
+                                                     for (Message *currentMessage in self.emailArray)
                                                      {
-                                                         found = YES;
+                                                         if (currentMessage.messageID == message.messageID)
+                                                         {
+                                                             found = YES;
+                                                         }
+                                                     }
+                                                     if (!found)
+                                                     {
+                                                         [newMessages addObject:message];
                                                      }
                                                  }
-                                                 if (!found)
+                                                 
+                                                 //Add new Messages to the new Email Array
+                                                 NSArray *newEmailArray = [NSArray arrayWithObjects:email6, email7, nil];
+                                                 for (Message *message in newEmailArray)
                                                  {
-                                                     [newMessages addObject:message];
+                                                     int index = 0;
+                                                     [self.emailArray insertObject:message atIndex:index];
+                                                     index++;
                                                  }
+                                                 
+                                                 //Create an array of indexPaths
+                                                 NSMutableArray *insertIndexPaths = [[NSMutableArray alloc] initWithCapacity:3];
+                                                 for (int i = 0; i < newEmailArray.count ; i++)
+                                                 {
+                                                     [insertIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
+                                                 }
+                                                 
+                                                 [self.theTableView insertRowsAtIndexPaths:insertIndexPaths withRowAnimation:UITableViewRowAnimationMiddle];
+                                                 
+                                                 NSLog(@"New messages: %@", newMessages);
                                              }
-                                             
-                                             //Add new Messages to the new Email Array
-                                             NSArray *newEmailArray = [NSArray arrayWithObjects:email6, email7, nil];
-                                             for (Message *message in newEmailArray)
+                                             else if ([[responseObject objectForKey:@"Status"] intValue] == -1 ) //Session invalidated
                                              {
-                                                 int index = 0;
-                                                 [self.emailArray insertObject:message atIndex:index];
-                                                 index++;
+                                                 //Return to Login Screen
+                                                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"[Dev Note]You have been logged out. Perhaps you logged in a different device. or your session timed out. Pressing okay will send you to the login page" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
+                                                 [alert show];
+                                                 
                                              }
-                                             
-                                             //Create an array of indexPaths
-                                             NSMutableArray *insertIndexPaths = [[NSMutableArray alloc] initWithCapacity:3];
-                                             for (int i = 0; i < newEmailArray.count ; i++)
-                                             {
-                                                 [insertIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
-                                             }
-                                             
-                                             [self.theTableView insertRowsAtIndexPaths:insertIndexPaths withRowAnimation:UITableViewRowAnimationMiddle];
-
-                                             NSLog(@"New messages: %@", newMessages);
                                              
                                          } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
                                              //failure
@@ -240,6 +250,8 @@
     
     [self getEmails];
     [self getContacts];
+    
+
      
 
 }
@@ -247,23 +259,35 @@
 - (void)getEmails
 {
     NSDictionary *params = [NSDictionary dictionaryWithObject:self.currentUser.sessionToken forKey:@"sessionToken"];
-
+    
     [[PikuZoneAPIClient sharedInstance] postPath:@"GetMessages.ashx"
                                       parameters:params
                                          success:^(AFHTTPRequestOperation *operation, id responseObject) {
                                              //success
                                              
                                              //if status == 1 don't forget to check NTS.
-                                             NSDictionary *completeMessageDict = [responseObject objectForKey:@"Messages"];
-                                             
-                                             
-                                             for (NSDictionary *singleMessageDict in completeMessageDict) {
-                                                 Message *message = [[Message alloc] initWithMessageDictionary:singleMessageDict];
+                                             if ([[responseObject objectForKey:@"Status"] intValue] == 1)  //Login Successful
+                                             {
                                                  
-                                                 [self.emailArray addObject:message];
+                                                 NSDictionary *completeMessageDict = [responseObject objectForKey:@"Messages"];
+                                                 
+                                                 
+                                                 for (NSDictionary *singleMessageDict in completeMessageDict) {
+                                                     Message *message = [[Message alloc] initWithMessageDictionary:singleMessageDict];
+                                                     
+                                                     [self.emailArray addObject:message];
+                                                 }
+                                                 
+                                                 [theTableView reloadData];
                                              }
-                                             
-                                             [theTableView reloadData];
+                                             else if ([[responseObject objectForKey:@"Status"] intValue] == -1 ) //Session invalidated
+                                             {
+                                                 //Return to Login Screen
+                                                 NSLog(@"Return o logonvc");
+                                                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"[Dev Note]You have been logged out. Perhaps you logged in a different device. or your session timed out. Pressing okay will send you to the login page" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
+                                                 [alert show];
+                                                 
+                                             }
                                          } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
                                              //failure
                                              NSLog(@"%@", [error localizedDescription]);
@@ -281,14 +305,23 @@
     [[PikuZoneAPIClient sharedInstance] postPath:@"GetContacts.ashx" parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
         //success
         
-        //if status == 1 make sure you check
-        NSDictionary *completeContactDict = [responseObject objectForKey:@"Contacts"];
-        
-        for (NSDictionary *singleContactDict in completeContactDict)
+        if ([[responseObject objectForKey:@"Status"] intValue] == 1)  //Login Successful
         {
-            Contact *contact = [[Contact alloc] initWithContactDictionary:singleContactDict];
+
+            NSDictionary *completeContactDict = [responseObject objectForKey:@"Contacts"];
             
-            [self.contactArray addObject:contact];
+            for (NSDictionary *singleContactDict in completeContactDict)
+            {
+                Contact *contact = [[Contact alloc] initWithContactDictionary:singleContactDict];
+                
+                [self.contactArray addObject:contact];
+            }
+        } else if ([[responseObject objectForKey:@"Status"] intValue] == -1 ) //Session invalidated
+        {
+            //Return to Login Screen
+            NSLog(@"Return o logonvc");
+
+            
         }
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -297,6 +330,16 @@
         
     }];
     
+}
+
+#pragma mark UIAlertViewDelegate Methods
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == alertView.cancelButtonIndex) {
+        AppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+        [appDelegate presentLoginViewController];
+    }
 
 }
 
@@ -445,6 +488,8 @@
     //    
     
     TTMessageController* controller = [[TTMessageController alloc] initWithRecipients:nil];
+    controller.navigationBarTintColor = [UIColor colorWithRed:0 green:100/255.f blue:0 alpha:1.0];
+    
     controller.dataSource =  [[MockSearchDataSource alloc] init];
     controller.delegate = self;
     controller.showsRecipientPicker = YES;
@@ -672,5 +717,7 @@
     
     
 }
+
+
 
 @end
