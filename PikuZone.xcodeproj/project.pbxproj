@@ -50,6 +50,7 @@
 		169F8BD7159E007200F8B1C3 /* SearchTestController.m in Sources */ = {isa = PBXBuildFile; fileRef = 169F8BD6159E007200F8B1C3 /* SearchTestController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		169F8BE0159E365700F8B1C3 /* RecipientViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 169F8BDE159E365600F8B1C3 /* RecipientViewController.m */; };
 		169F8BE1159E365700F8B1C3 /* RecipientViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 169F8BDF159E365700F8B1C3 /* RecipientViewController.xib */; };
+		16B40BB015D02CFC0036BCBC /* Background.png in Resources */ = {isa = PBXBuildFile; fileRef = 16B40BAF15D02CFC0036BCBC /* Background.png */; };
 		16EEB2B015CC8A8D009C38C8 /* libThree20Core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FF377715CC78D500C9DC09 /* libThree20Core.a */; };
 		16EEB2B715CC941C009C38C8 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EEB2B615CC941C009C38C8 /* User.m */; };
 		16EEB2C115CC9929009C38C8 /* ActivityView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EEB2C015CC9929009C38C8 /* ActivityView.m */; };
@@ -269,6 +270,7 @@
 		169F8BDD159E365600F8B1C3 /* RecipientViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecipientViewController.h; sourceTree = "<group>"; };
 		169F8BDE159E365600F8B1C3 /* RecipientViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecipientViewController.m; sourceTree = "<group>"; };
 		169F8BDF159E365700F8B1C3 /* RecipientViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RecipientViewController.xib; sourceTree = "<group>"; };
+		16B40BAF15D02CFC0036BCBC /* Background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Background.png; sourceTree = "<group>"; };
 		16EEB2B515CC941C009C38C8 /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
 		16EEB2B615CC941C009C38C8 /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
 		16EEB2BF15CC9929009C38C8 /* ActivityView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityView.h; sourceTree = "<group>"; };
@@ -334,6 +336,7 @@
 				1686C04515AFB620006427C9 /* avatar3.png */,
 				1686C04615AFB620006427C9 /* avatar4.png */,
 				1686C04715AFB621006427C9 /* avatar5.png */,
+				16B40BAF15D02CFC0036BCBC /* Background.png */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -378,21 +381,17 @@
 		169F8B31159D61FF00F8B1C3 /* ImportingThree20 */ = {
 			isa = PBXGroup;
 			children = (
+				16B40BB615D0477A0036BCBC /* Helper Classes */,
 				169F8B3A159D61FF00F8B1C3 /* AppDelegate.h */,
 				169F8B3B159D61FF00F8B1C3 /* AppDelegate.m */,
-				16EEB2BF15CC9929009C38C8 /* ActivityView.h */,
-				16EEB2C015CC9929009C38C8 /* ActivityView.m */,
 				16FF36FF15CC752E00C9DC09 /* PikuZoneAPIClient.h */,
 				16FF370015CC752E00C9DC09 /* PikuZoneAPIClient.m */,
 				165E541115A2260D00066F64 /* LoginViewController.h */,
 				165E541215A2260D00066F64 /* LoginViewController.m */,
 				165E541315A2260D00066F64 /* LoginViewController.xib */,
-				16EEB2B515CC941C009C38C8 /* User.h */,
-				16EEB2B615CC941C009C38C8 /* User.m */,
 				165E541B15A22C9000066F64 /* InboxViewController.h */,
 				165E541C15A22C9000066F64 /* InboxViewController.m */,
 				165E541D15A22C9000066F64 /* InboxViewController.xib */,
-				16758B8615A78CCE0061A30C /* EmailCell.xib */,
 				165E542815A2472C00066F64 /* EmailDetailViewController.h */,
 				165E542915A2472D00066F64 /* EmailDetailViewController.m */,
 				165E542A15A2472D00066F64 /* EmailDetailViewController.xib */,
@@ -411,10 +410,6 @@
 				169F8BDF159E365700F8B1C3 /* RecipientViewController.xib */,
 				1686BEEB15AE242D006427C9 /* BarButtonMethods.h */,
 				1686BEEC15AE242E006427C9 /* BarButtonMethods.m */,
-				165E542515A243D700066F64 /* Message.h */,
-				165E542615A243D700066F64 /* Message.m */,
-				163DD398159E484600F89F30 /* Contact.h */,
-				163DD399159E484600F89F30 /* Contact.m */,
 				169F8B32159D61FF00F8B1C3 /* Supporting Files */,
 			);
 			path = ImportingThree20;
@@ -484,6 +479,22 @@
 				169F8BA1159D68C300F8B1C3 /* UIUnitTests.octest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		16B40BB615D0477A0036BCBC /* Helper Classes */ = {
+			isa = PBXGroup;
+			children = (
+				16EEB2BF15CC9929009C38C8 /* ActivityView.h */,
+				16EEB2C015CC9929009C38C8 /* ActivityView.m */,
+				165E542515A243D700066F64 /* Message.h */,
+				165E542615A243D700066F64 /* Message.m */,
+				163DD398159E484600F89F30 /* Contact.h */,
+				163DD399159E484600F89F30 /* Contact.m */,
+				16758B8615A78CCE0061A30C /* EmailCell.xib */,
+				16EEB2B515CC941C009C38C8 /* User.h */,
+				16EEB2B615CC941C009C38C8 /* User.m */,
+			);
+			name = "Helper Classes";
 			sourceTree = "<group>";
 		};
 		16FF369615CC72B600C9DC09 /* AFNetworking */ = {
@@ -730,6 +741,7 @@
 				1686C04A15AFB621006427C9 /* avatar3.png in Resources */,
 				1686C04B15AFB621006427C9 /* avatar4.png in Resources */,
 				1686C04C15AFB621006427C9 /* avatar5.png in Resources */,
+				16B40BB015D02CFC0036BCBC /* Background.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -79,8 +79,9 @@
                                                  UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:self.currentUser.emailAddress delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
                                                  [alert show];
                                                  
-                                                 
+
                                                      InboxViewController *inboxViewController = [[InboxViewController alloc] initWithNibName:@"InboxViewController" bundle:nil];
+                                                 
                                                  
                                                  //Pass the User object we get from the authenticate method into the inboxviewController.
                                                      inboxViewController.currentUser = self.currentUser;
@@ -88,6 +89,18 @@
                                                      UINavigationController *mainNavigationController = [[UINavigationController alloc] initWithRootViewController:inboxViewController];
                                                  
                                                      [self.navigationController presentModalViewController:mainNavigationController animated:YES];
+//                                                 [self.navigationController pushViewController:inboxViewController animated:YES];
+//                                                 [self.presentingViewController dismissModalViewControllerAnimated:YES];
+//                                                 [self.navigationController pushViewController:inboxViewController animated:NO];
+                                                 
+                                                 
+                                                 
+                                                 //Save the current User in the User defaults.
+                                                 [[NSUserDefaults standardUserDefaults] setObject:self.currentUser.emailAddress forKey:@"emailAddress"];
+                                                 [[NSUserDefaults standardUserDefaults] setObject:self.currentUser.name forKey:@"name"];
+                                                 [[NSUserDefaults standardUserDefaults] setObject:self.currentUser.sessionToken forKey:@"sessionToken"];
+
+                                                 
                                                  
                                                  
                                              } else //Login unsuccessful
@@ -133,14 +146,22 @@
 
 - (void)viewDidLoad
 {
+    [usernameField becomeFirstResponder];
+
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     
     self.title = @"Login";
-    [usernameField becomeFirstResponder];
     
     usernameField.text = @"Kid1";
     passwordField.text = @"Password1";
+
+    NSString *name = [[NSUserDefaults standardUserDefaults] objectForKey:@"name"];
+    NSString *email = [[NSUserDefaults standardUserDefaults] objectForKey:@"emailAddress"];
+    NSString *st = [[NSUserDefaults standardUserDefaults] objectForKey:@"sessionToken"];
+    NSString *msg = [NSString stringWithFormat:@" %@ %@ %@", name, email, st];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Test Alert" message:msg delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
+    [alert show];
 }
 
 - (void)viewDidUnload

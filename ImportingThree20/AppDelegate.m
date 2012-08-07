@@ -10,19 +10,60 @@
 
 #import "ViewController.h"
 #import "LoginViewController.h"
+#import "InboxViewController.h"
+#import "User.h"
+
+@interface AppDelegate()
+//    void uncaughtExceptionHandler(NSException *exception);
+@end
 
 @implementation AppDelegate
 
 @synthesize window = _window;
 @synthesize navigationController = _navigationController;
+@synthesize viewController = _viewController;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    
+//    NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
+
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
-    LoginViewController *loginViewController = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
-    self.navigationController = [[UINavigationController alloc] initWithRootViewController:loginViewController];
-    self.window.rootViewController = self.navigationController;
+
+    
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    if ([userDefaults objectForKey:@"name"]) //Meaning we have a user logged in and cached
+    {
+        //Skip straight to the main View
+
+        InboxViewController *inboxViewController = [[InboxViewController alloc] initWithNibName:@"InboxViewController" bundle:nil];
+        UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:inboxViewController];
+
+            //Resurge User from user defaults
+            inboxViewController.currentUser = [[User alloc] init];
+            inboxViewController.currentUser.sessionToken = [userDefaults objectForKey:@"sessionToken"];
+            inboxViewController.currentUser.name = [userDefaults objectForKey:@"name"];
+            inboxViewController.currentUser.emailAddress = [userDefaults objectForKey:@"emailAddress"];
+        
+        
+        
+        self.viewController = navController;
+        self.window.rootViewController = self.viewController;
+    } else {
+        LoginViewController *loginViewController = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
+
+        // Go to the welcome screen and have them log in or create an account.
+    	UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:loginViewController];
+        loginViewController.title = @"Welcome to PikuZone";
+                
+        self.viewController = navController;
+        self.window.rootViewController = self.viewController;
+    }
+    
+    
+    
     [self.window makeKeyAndVisible];
     return YES;
 
@@ -66,5 +107,9 @@
      See also applicationDidEnterBackground:.
      */
 }
+
+
+#pragma mark - Custom Methods
+
 
 @end

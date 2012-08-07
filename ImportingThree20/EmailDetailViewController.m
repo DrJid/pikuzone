@@ -21,6 +21,7 @@
 @synthesize theTableView;
 @synthesize sendTimer = _sendTimer;
 @synthesize mainMessageController;
+@synthesize contactArray;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -46,9 +47,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     
-    self.title = self.email.subject;
-    NSLog(@"Email Subject %@", self.email.subject);
-    
+    self.title = self.email.subject;    
     self.theTableView.allowsSelection = NO;
     
     
@@ -396,8 +395,7 @@
     TTMessageTextField *messageBodyField = [fields objectAtIndex:2];
     NSLog(@"Message Body: %@", messageBodyField.text);
     
-    
-    RecipientViewController *rvc = [[RecipientViewController alloc] init];
+    RecipientViewController *rvc = [[RecipientViewController alloc] initWithStyle:UITableViewStylePlain contacts:self.contactArray];
     
     TTMessageRecipientField* toField = [fields objectAtIndex:0];
     for (NSString *name in toField.recipients) {
@@ -448,7 +446,7 @@
     //    [alert show];
     
     
-    RecipientViewController *recipientController = [[RecipientViewController alloc] init];
+    RecipientViewController *recipientController = [[RecipientViewController alloc] initWithStyle:UITableViewStylePlain contacts:self.contactArray];
     recipientController.delegate = self;
     recipientController.title = @"Family Book";
     recipientController.navigationItem.prompt = @"Select a recipient";

@@ -16,5 +16,10 @@
 
 @property (strong, nonatomic) UINavigationController *navigationController;
 
+@property (strong, nonatomic) UIViewController *viewController;
+
+
+- (void)presentLoginViewControllerThroughRootViewController;
+
 
 @end

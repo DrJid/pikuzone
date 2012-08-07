@@ -23,4 +23,7 @@
 @property(nonatomic, strong) NSTimer* sendTimer;
 @property(nonatomic, strong) TTMessageController *mainMessageController;
 
+@property (nonatomic, strong) NSMutableArray *contactArray;
+
+
 @end

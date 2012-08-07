@@ -36,7 +36,6 @@
         self.title = @"FamilyBook";
         self.contactArray = [[NSMutableArray alloc] initWithCapacity:5];
         self.contactArray = contactsArray;
-        NSLog(@"ContactArray in init: %@", self.contactArray);
 //        self.contactArray = [[NSMutableArray alloc] initWithArray:contactsArray];
         
     }
@@ -92,7 +91,6 @@
 
     
 //    self.contactArray = [NSMutableArray arrayWithObjects:bill, mary, jo, grandma, maijid, steve, nil];
-    NSLog(@"ContactArray: %@", self.contactArray);
     
     
 }

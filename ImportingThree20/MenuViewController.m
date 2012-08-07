@@ -7,9 +7,11 @@
 //
 
 #import "MenuViewController.h"
+#import "AppDelegate.h"
 #define InboxRow 0
 #define DeletedRow 1
 #define SentRow 2
+#define LogOutRow 3
 
 
 @implementation MenuViewController
@@ -107,7 +109,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    return 3;
+    return 4;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -133,6 +135,11 @@
     else if (indexPath.row  == SentRow) {
         cell.textLabel.text = @"Sent";
         return cell;
+    }
+    
+    else if (indexPath.row == LogOutRow) {
+        cell.textLabel.text = @"Logout (Development)";
+        cell.textLabel.textAlignment = UITextAlignmentCenter;
     }
     
     return cell;
@@ -196,6 +203,20 @@
     else if (indexPath.row  == SentRow) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Go to Sent View" message:@"test message" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
         [alert show];
+    }
+    
+    else if (indexPath.row == LogOutRow) {
+        //Log out by clearing NSUserDefaults
+        //Save the current User in the User defaults.
+        [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"userID"];
+        [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"emailAddress"];
+        [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"name"];
+        [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"sessionToken"];
+        
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Test Alert" message:@"You are now logged out. But quit the app to complete it.. Otherwise, It'll look like you're still logged in.. and do some other wierd stuff.. This is for dev purposes so... " delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
+        [alert show];
+
+        
     }
 
     

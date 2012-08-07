@@ -42,9 +42,10 @@
     [self.navigationController presentModalViewController:menuNavController animated:YES];
 }
 
-- (IBAction)refreshAction:(id)sender {
+- (IBAction)refreshAction:(id)sender
+{
     
-    //Get message called here. and the new data loaded up in a message object. And then added to the table. 
+    //Get message called here. and the new data loaded up in a message object. And then added to the table.
     
     Message *email6 = [[Message alloc] init];
     email6.senderName = @"Cynthia";
@@ -53,30 +54,72 @@
     
     Message *email7 = [[Message alloc] init];
     email7.senderName = @"Young Grandma";
-    email7.subject = @"New Toy";
+    email7.subject = @"Second PikuZone new Email";
     email7.messageBody = @"This is the new toy email. The desire must be burning. Incessant. The power of desire backed by faith in yourself. can lift you up. Rob the grave of it's victims. But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to";
+    
+    
+    NSMutableArray *newMessages = [[NSMutableArray alloc] initWithCapacity:5];
+    
+    NSDictionary *params = [NSDictionary dictionaryWithObject:self.currentUser.sessionToken forKey:@"sessionToken"];
+    
+    [[PikuZoneAPIClient sharedInstance] postPath:@"GetMessages.ashx"
+                                      parameters:params
+                                         success:^(AFHTTPRequestOperation *operation, id responseObject) {
+                                             //success
+                                             
+                                             //if status == 1 don't forget to check NTS.
+                                             NSDictionary *completeMessageDict = [responseObject objectForKey:@"Messages"];
+                                             
+                                             
+                                             for (NSDictionary *singleMessageDict in completeMessageDict) {
+                                                 Message *message = [[Message alloc] initWithMessageDictionary:singleMessageDict];
+                                                 BOOL found = NO;
+                                                 for (Message *currentMessage in self.emailArray)
+                                                 {
+                                                     if (currentMessage.messageID == message.messageID)
+                                                     {
+                                                         found = YES;
+                                                     }
+                                                 }
+                                                 if (!found)
+                                                 {
+                                                     [newMessages addObject:message];
+                                                 }
+                                             }
+                                             
+                                             //Add new Messages to the new Email Array
+                                             NSArray *newEmailArray = [NSArray arrayWithObjects:email6, email7, nil];
+                                             for (Message *message in newEmailArray)
+                                             {
+                                                 int index = 0;
+                                                 [self.emailArray insertObject:message atIndex:index];
+                                                 index++;
+                                             }
+                                             
+                                             //Create an array of indexPaths
+                                             NSMutableArray *insertIndexPaths = [[NSMutableArray alloc] initWithCapacity:3];
+                                             for (int i = 0; i < newEmailArray.count ; i++)
+                                             {
+                                                 [insertIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
+                                             }
+                                             
+                                             [self.theTableView insertRowsAtIndexPaths:insertIndexPaths withRowAnimation:UITableViewRowAnimationMiddle];
 
-    
-    
-    int newRowIndex = 0 ; 
-//    NSArray *newEmailArray = [NSArray arrayWithObjects:email6, email7, nil];
-//    NSSet *newSet = [NSSet setWithObjects:0, 1, nil];
+                                             NSLog(@"New messages: %@", newMessages);
+                                             
+                                         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+                                             //failure
+                                             NSLog(@"%@", [error localizedDescription]);
+                                             
+                                         }];
 
-    [self.emailArray insertObject:email6 atIndex:0];
-//    [self.emailArray insertObjects:newEmailArray atIndexes:newSet];
-    
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:newRowIndex inSection:0];
-    NSArray *indexPaths = [NSArray arrayWithObject:indexPath];
-    [self.theTableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+  
     
     [self configureStatusLabel];
-    
-       
-    BarButtonMethods *bbm = [[BarButtonMethods alloc] init];
-    [bbm refreshAction]; 
 }
 
--(void)configureStatusLabel {
+-(void)configureStatusLabel
+{
     
     NSDate *now = [NSDate date];
 	NSDateFormatter *formatter = nil;
@@ -108,6 +151,8 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
+
+       
     }
     return self;
 }
@@ -124,6 +169,12 @@
 
 #pragma mark - View lifecycle
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+       
+}
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -167,35 +218,7 @@
     //Register the NIB cell object
     self.cellIdentifier = @"InboxCell";
     [theTableView registerNib:[UINib nibWithNibName:@"EmailCell" bundle:nil] forCellReuseIdentifier:self.cellIdentifier];
-    
-    
-    
-//    //Create Email Test Data! 
-//    Message *email1 = [[Message alloc] init];
-//    email1.senderName = @"Steve";
-//    email1.subject = @"How was the exam?";
-//    email1.messageBody = @"I hope it was all okay. Did you remember Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-//    
-//    Message *email2 = [[Message alloc] init];
-//    email2.senderName = @"Young Grandma";
-//    email2.subject = @"I found your toy!";
-//    email2.messageBody = @"It was in the shower.";
-//    
-//    Message *email3 = [[Message alloc] init];
-//    email3.senderName = @"Cousin Mary";
-//    email3.subject = @"Medium Sized Message";
-//    email3.messageBody = @"I forgot the name but... Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora";
-//    
-//    Message *email4 = [[Message alloc] init];
-//    email4.senderName = @"Cynthia";
-//    email4.subject = @"Who is Cicero?";
-//    email4.messageBody = @"But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to";
-//    
-//    Message *email5 = [[Message alloc] init];
-//    email5.senderName = @"Maijid";
-//    email5.subject = @"PikuZone Progress";
-//    email5.messageBody = @"But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to";
-//    
+   
 //    self.emailArray = [NSMutableArray arrayWithObjects:email1, email2, email3, email4,  email5, nil ];
     self.emailArray = [NSMutableArray arrayWithCapacity:5];
     self.contactArray = [NSMutableArray arrayWithCapacity:5];
@@ -203,31 +226,56 @@
     //We can download the user's contacts and stuff with a method in here. It should do it on a different thread obviously.
     //getContacts(user.sessionTokenString) sends post and recieve an array of Contact Objects.
     
-    NSDictionary *params = [NSDictionary dictionaryWithObject:self.currentUser.sessionToken forKey:@"sessionToken"];
+  
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     
+    if (!self.currentUser) {
+        self.currentUser.sessionToken = [userDefaults objectForKey:@"sessionToken"];
+        self.currentUser.name = [userDefaults objectForKey:@"name"];
+        self.currentUser.emailAddress = [userDefaults objectForKey:@"emailAddress"];
+    }
+    
+    NSLog(@"Called ViewDidLoad!! - Right before Params %@ %@ %@", self.currentUser.sessionToken, self.currentUser.emailAddress, self.currentUser.name);
+
+    
+    [self getEmails];
+    [self getContacts];
+     
+
+}
+
+- (void)getEmails
+{
+    NSDictionary *params = [NSDictionary dictionaryWithObject:self.currentUser.sessionToken forKey:@"sessionToken"];
+
     [[PikuZoneAPIClient sharedInstance] postPath:@"GetMessages.ashx"
                                       parameters:params
                                          success:^(AFHTTPRequestOperation *operation, id responseObject) {
                                              //success
                                              
-                                             //if status == 1 don't forget to check NTS. 
+                                             //if status == 1 don't forget to check NTS.
                                              NSDictionary *completeMessageDict = [responseObject objectForKey:@"Messages"];
-//                                             NSLog(@"Count: %i", completeMessageDict.count);
+                                             
                                              
                                              for (NSDictionary *singleMessageDict in completeMessageDict) {
                                                  Message *message = [[Message alloc] initWithMessageDictionary:singleMessageDict];
-//                                                 NSLog(@"single: %@", singleMessageDict);
                                                  
                                                  [self.emailArray addObject:message];
                                              }
                                              
-//                                             NSLog(@"response: %@", completeMessageDict);
                                              [theTableView reloadData];
                                          } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
                                              //failure
                                              NSLog(@"%@", [error localizedDescription]);
                                              
                                          }];
+    
+}
+
+- (void)getContacts
+{
+    NSDictionary *params = [NSDictionary dictionaryWithObject:self.currentUser.sessionToken forKey:@"sessionToken"];
+    
     
     
     [[PikuZoneAPIClient sharedInstance] postPath:@"GetContacts.ashx" parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
@@ -236,7 +284,8 @@
         //if status == 1 make sure you check
         NSDictionary *completeContactDict = [responseObject objectForKey:@"Contacts"];
         
-        for (NSDictionary *singleContactDict in completeContactDict) {
+        for (NSDictionary *singleContactDict in completeContactDict)
+        {
             Contact *contact = [[Contact alloc] initWithContactDictionary:singleContactDict];
             
             [self.contactArray addObject:contact];
@@ -248,9 +297,7 @@
         
     }];
     
-    NSLog(@"self.contactarray %@", self.contactArray);
-    
-    
+
 }
 
 - (void)viewDidUnload
@@ -371,8 +418,10 @@
     
     EmailDetailViewController *emailDetailViewController = [[EmailDetailViewController alloc] init];
     emailDetailViewController.email = selectedEmail;
+//    emailDetailViewController.contactArray = [[NSMutableArray alloc] init];
+    emailDetailViewController.contactArray = self.contactArray;
     
-    NSLog(@"%@", selectedEmail.subject);
+    NSLog(@"Subject: %@", selectedEmail.subject);
     
     [self.theTableView deselectRowAtIndexPath:indexPath animated:YES];
     [self.navigationController pushViewController:emailDetailViewController animated:YES];
@@ -489,7 +538,7 @@
     NSLog(@"Message Body: %@", messageBodyField.text);
     
     
-    RecipientViewController *rvc = [[RecipientViewController alloc] init];
+    RecipientViewController *rvc = [[RecipientViewController alloc] initWithStyle:UITableViewStylePlain contacts:self.contactArray];
 
     TTMessageRecipientField* toField = [fields objectAtIndex:0];
     for (NSString *name in toField.recipients) {
@@ -499,8 +548,7 @@
         NSLog(@"Name: %@, Email: %@", recipient.name, recipient.email);
         
     }
-    
-    
+
     [self.modalViewController dismissModalViewControllerAnimated:YES];
 }
 
