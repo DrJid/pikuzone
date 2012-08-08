@@ -26,6 +26,7 @@
 @property (nonatomic, strong) User *currentUser;
 @property (nonatomic, strong) NSMutableArray *contactArray;
 
+@property (weak, nonatomic) IBOutlet UIImageView *testImageview;
 
 
 @end

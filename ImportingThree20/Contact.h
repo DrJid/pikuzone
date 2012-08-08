@@ -14,6 +14,8 @@
 @property (nonatomic, copy) NSString *email; 
 @property (nonatomic, copy) NSString *photoFilePath;
 @property (nonatomic, strong) UIImage *recipientImage;
+@property (nonatomic, strong) UIImage *contactImage;
+
 @property (nonatomic) int contactID;
 
 

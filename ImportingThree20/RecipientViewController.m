@@ -158,7 +158,7 @@
     // Configure the cell...
     Contact *recipient = [self.contactArray objectAtIndex:indexPath.row];
     cell.textLabel.text = recipient.name;
-    cell.imageView.image = recipient.recipientImage;
+    cell.imageView.image = recipient.contactImage;
     
     return cell;
 }

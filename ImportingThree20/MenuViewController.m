@@ -212,9 +212,11 @@
         [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"emailAddress"];
         [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"name"];
         [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"sessionToken"];
+
+        [self.presentingViewController dismissModalViewControllerAnimated:YES];
         
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Test Alert" message:@"You are now logged out. But quit the app to complete it.. Otherwise, It'll look like you're still logged in.. and do some other wierd stuff.. This is for dev purposes so... " delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
-        [alert show];
+        AppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+        [appDelegate presentLoginViewController];
 
         
     }

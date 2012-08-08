@@ -31,6 +31,7 @@
 @synthesize emailArray;
 @synthesize statusLabel;
 @synthesize contactArray;
+@synthesize testImageview;
 
 
 #pragma mark - Custom Inbox Methods
@@ -314,13 +315,39 @@
             {
                 Contact *contact = [[Contact alloc] initWithContactDictionary:singleContactDict];
                 
+                
+                    //Obtain the contact image here with another request.
+                NSDictionary *getfileParams = [NSDictionary dictionaryWithObjectsAndKeys:
+                                               self.currentUser.sessionToken, @"SessionToken",
+                                               contact.photoFilePath, @"FilePath" , nil];
+
+               [[PikuZoneAPIClient sharedInstance] setDefaultHeader:@"Accept" value:@"image/jpg"];
+                
+                
+                [[PikuZoneAPIClient sharedInstance] postPath:@"GetFile.ashx" parameters:getfileParams
+                                                     success:^(AFHTTPRequestOperation *operation, id responseObject) {
+                                                         
+                                                         
+                                                         //By default, this responds to only JSON request, so we switch the headers so it can grab down images and then switch back. For some reason, I have to put it in here... Wierd.. 
+                                                         [[PikuZoneAPIClient sharedInstance] setDefaultHeader:@"Accept" value:@"image/jpg"];
+
+                                                         contact.contactImage = [UIImage imageWithData:responseObject];
+                                                         
+                                                         [[PikuZoneAPIClient sharedInstance] setDefaultHeader:@"Accept" value:@"application/json"];
+
+                                                                
+                                                     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+                                                         //Handle Failure
+                                                         NSLog(@"%@", [error localizedDescription]);
+
+                                                     }];
+                
+                
                 [self.contactArray addObject:contact];
             }
         } else if ([[responseObject objectForKey:@"Status"] intValue] == -1 ) //Session invalidated
         {
-            //Return to Login Screen
-            NSLog(@"Return o logonvc");
-
+            //Return to Login Screen - Handled above in getEmail since that's called in first. 
             
         }
         
@@ -329,7 +356,10 @@
         NSLog(@"%@", [error localizedDescription]);
         
     }];
-    
+
+    //Set back to receiving JSON
+    [[PikuZoneAPIClient sharedInstance] setDefaultHeader:@"Accept" value:@"application/json"];
+
 }
 
 #pragma mark UIAlertViewDelegate Methods
@@ -346,6 +376,7 @@
 - (void)viewDidUnload
 {
     [self setTheTableView:nil];
+    [self setTestImageview:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -590,9 +621,11 @@
         
         //Get the actual recipient class: 
         Contact *recipient = [rvc getRecipientForName:name];
-        NSLog(@"Name: %@, Email: %@", recipient.name, recipient.email);
+        NSLog(@"Name: %@, Id: %i", recipient.name, recipient.contactID);
         
     }
+    // Will do the sending of a message RIGHT HEREREERERERERE
+    
 
     [self.modalViewController dismissModalViewControllerAnimated:YES];
 }
@@ -664,7 +697,7 @@
 
 #pragma mark - Recipient View Controller Delegate
 - (void)recipientViewController:(RecipientViewController*)controller didSelectRecipient:(Contact *)recipient {
-    NSLog(@"Selected %@ email address: %@", recipient.name, recipient.email);    
+    NSLog(@"Selected %@ id: %i", recipient.name, recipient.contactID);
     
 //    TTMessageController* composeController = (TTMessageController*)controller;//controller.navigationController ;// self.navigationController.topViewController ;
 //    NSLog(@"Del Cont: %@", [self.mainMessageController class]);
@@ -673,7 +706,6 @@
     [self.mainMessageController addRecipient:recipientName forFieldAtIndex:0];
     [controller dismissModalViewControllerAnimated:YES];
 }
-
 
 
 

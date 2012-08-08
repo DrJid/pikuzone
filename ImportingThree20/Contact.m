@@ -7,11 +7,12 @@
 //
 
 #import "Contact.h"
+#import "PikuZoneAPIClient.h"
 
 @implementation Contact
 
 @synthesize name, recipientImage, photoFilePath;
-@synthesize contactID;
+@synthesize contactID, contactImage;
 
 
 -(id)initWithname:(NSString *)rname email:(NSString *)remail image:(UIImage *)image{
@@ -30,7 +31,7 @@
     if ((self = [super init])) {
         self.name = [contactDictionary objectForKey:@"Name"];
         self.contactID = [[contactDictionary objectForKey:@"ContactId"] intValue];
-        self.photoFilePath = [contactDictionary objectForKey:@"photoFilePath"];
+        self.photoFilePath = [contactDictionary objectForKey:@"PhotoFilePath"];
     }
     return self;
 }

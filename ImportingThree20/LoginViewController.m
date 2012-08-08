@@ -170,10 +170,10 @@
     usernameField.text = @"Kid1";
     passwordField.text = @"Password1";
 
-    NSString *name = [[NSUserDefaults standardUserDefaults] objectForKey:@"name"];
-    NSString *email = [[NSUserDefaults standardUserDefaults] objectForKey:@"emailAddress"];
-    NSString *st = [[NSUserDefaults standardUserDefaults] objectForKey:@"sessionToken"];
-    NSString *msg = [NSString stringWithFormat:@" %@ %@ %@", name, email, st];
+//    NSString *name = [[NSUserDefaults standardUserDefaults] objectForKey:@"name"];
+//    NSString *email = [[NSUserDefaults standardUserDefaults] objectForKey:@"emailAddress"];
+//    NSString *st = [[NSUserDefaults standardUserDefaults] objectForKey:@"sessionToken"];
+//    NSString *msg = [NSString stringWithFormat:@" %@ %@ %@", name, email, st];
 //    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Test Alert" message:msg delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
 //    [alert show];
 }
