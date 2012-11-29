@@ -11,6 +11,7 @@
 #import "ViewController.h"
 #import "LoginViewController.h"
 #import "InboxViewController.h"
+#import "MenuViewController.h"
 #import "User.h"
 
 @interface AppDelegate()
@@ -30,6 +31,8 @@
     [[UIToolbar appearance] setTintColor:[UIColor colorWithRed:0 green:100/255.f blue:0 alpha:1.0]];
 
 //    NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
+//    Left this as a quick way to take screenshots. This code is deprecated though and shouldn't be used in production'
+  //  [application setStatusBarHidden:YES animated:NO];
 
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
@@ -41,15 +44,23 @@
     {
         //Skip straight to the main View
 
-        InboxViewController *inboxViewController = [[InboxViewController alloc] initWithNibName:@"InboxViewController" bundle:nil];
-        UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:inboxViewController];
-
-            //Resurge User from user defaults
-            inboxViewController.currentUser = [[User alloc] init];
-            inboxViewController.currentUser.sessionToken = [userDefaults objectForKey:@"sessionToken"];
-            inboxViewController.currentUser.name = [userDefaults objectForKey:@"name"];
-            inboxViewController.currentUser.emailAddress = [userDefaults objectForKey:@"emailAddress"];
+        MenuViewController *menuViewController =[[MenuViewController alloc] initWithNibName:@"MenuViewController" bundle:nil];
+        menuViewController.inboxViewController = [[InboxViewController alloc] initWithNibName:@"InboxViewController" bundle:nil];
         
+        UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:menuViewController];
+
+        
+            //Resurge User from user defaults
+            menuViewController.currentUser = [[User alloc] init];
+            menuViewController.currentUser.sessionToken = [userDefaults objectForKey:@"sessionToken"];
+            menuViewController.currentUser.name = [userDefaults objectForKey:@"name"];
+            menuViewController.currentUser.emailAddress = [userDefaults objectForKey:@"emailAddress"];
+        
+        menuViewController.inboxViewController.currentUser = menuViewController.currentUser;
+        menuViewController.inboxViewController.title = @"Inbox";
+        menuViewController.inboxViewController.messageType = MessageTypeInbox;
+        
+        [navController pushViewController:menuViewController.inboxViewController animated:NO];
         
         
         self.viewController = navController;
@@ -71,7 +82,7 @@
     
     // Go to the welcome screen and have them log in or create an account.
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:loginViewController];
-    loginViewController.title = @"Welcome to PikuZone";
+    //loginViewController.title = @"Welcome to PikuZone";
     
     self.viewController = navController;
     self.window.rootViewController = self.viewController;

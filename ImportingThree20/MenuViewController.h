@@ -7,7 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "User.h"
+#import "InboxViewController.h"
 
 @interface MenuViewController : UITableViewController
+
+@property (nonatomic, strong) User *currentUser;
+
+//We give the Menu View Controller an Inbox View Controller since it's always already loaded. 
+@property (nonatomic, strong) InboxViewController *inboxViewController;
 
 @end

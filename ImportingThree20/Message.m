@@ -13,6 +13,7 @@
 @synthesize senderName, messageBody, read, subject, messageID;
 @synthesize contacts, senderID;
 
+
 -(id)initWithMessageDictionary:(NSDictionary *)messageDictionary
 {
     
@@ -24,6 +25,7 @@
         self.senderID = [[messageDictionary objectForKey:@"SenderId"] intValue];
         self.subject = [messageDictionary objectForKey:@"Subject"];
         self.messageBody = [messageDictionary objectForKey:@"MessageBody"];
+        self.read = [[messageDictionary objectForKey:@"Read"] boolValue];
     }
     return self;
 

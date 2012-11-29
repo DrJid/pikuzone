@@ -13,6 +13,14 @@
 #import "RecipientViewController.h"
 #import "User.h"
 #import "BarButtonMethods.h"
+#import "EmailDetailViewController.h"
+
+typedef enum
+{
+    MessageTypeInbox = 1,
+    MessageTypeSent,
+    MessageTypeDeleted,
+}MessageType;
 
 @interface InboxViewController : UIViewController <TTMessageControllerDelegate, RecipientViewControllerDelegate, UIAlertViewDelegate>
 
@@ -25,6 +33,10 @@
 
 @property (nonatomic, strong) User *currentUser;
 @property (nonatomic, strong) NSMutableArray *contactArray;
+@property (nonatomic, strong) EmailDetailViewController *emailDetailViewController;
+@property (nonatomic, copy) NSString *useOfViewController;
+@property (nonatomic) MessageType messageType;
+
 
 @property (weak, nonatomic) IBOutlet UIImageView *testImageview;
 

@@ -21,9 +21,15 @@
 #define kSenderLabel 1001
 #define kTitleLabel 1002
 #define kEmailDetailLabel 1003
+#define kReadTag 1004
 
 
-@implementation InboxViewController
+@implementation InboxViewController {
+    UIAlertView *sendingErrorAlert;
+    BOOL lastMessageErred;
+    NSString *savedMessageBodyTextFromError;
+    NSString *savedTitleTextFromError;
+}
 @synthesize theTableView;
 @synthesize cellIdentifier;
 @synthesize sendTimer = _sendTimer;
@@ -32,16 +38,20 @@
 @synthesize statusLabel;
 @synthesize contactArray;
 @synthesize testImageview;
-
+@synthesize emailDetailViewController;
+@synthesize useOfViewController;
+@synthesize messageType;
 
 #pragma mark - Custom Inbox Methods
 
 - (void) showMenuOptions:(id)sender
 {
     MenuViewController *menuViewController = [[MenuViewController alloc] init];
+    menuViewController.currentUser = self.currentUser;
     UINavigationController *menuNavController = [[UINavigationController alloc] initWithRootViewController:menuViewController];
 
-    [self.navigationController presentModalViewController:menuNavController animated:YES];
+//    [self.navigationController presentModalViewController:menuNavController animated:YES];
+    [self.navigationController popToRootViewControllerAnimated:YES];
 }
 
 - (IBAction)refreshAction:(id)sender
@@ -61,8 +71,11 @@
     
     
     NSMutableArray *newMessages = [[NSMutableArray alloc] initWithCapacity:5];
+  
     
-    NSDictionary *params = [NSDictionary dictionaryWithObject:self.currentUser.sessionToken forKey:@"sessionToken"];
+    NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:
+                            self.currentUser.sessionToken , @"sessionToken",
+                            [NSNumber numberWithInt:self.messageType], @"messageType", nil];
     
     [[PikuZoneAPIClient sharedInstance] postPath:@"GetMessages.ashx"
                                       parameters:params
@@ -92,7 +105,7 @@
                                                  
                                                  //Add new Messages to the new Email Array
                                                  NSArray *newEmailArray = [NSArray arrayWithObjects:email6, email7, nil];
-                                                 for (Message *message in newEmailArray)
+                                                 for (Message *message in newMessages)
                                                  {
                                                      int index = 0;
                                                      [self.emailArray insertObject:message atIndex:index];
@@ -101,16 +114,19 @@
                                                  
                                                  //Create an array of indexPaths
                                                  NSMutableArray *insertIndexPaths = [[NSMutableArray alloc] initWithCapacity:3];
-                                                 for (int i = 0; i < newEmailArray.count ; i++)
+                                                 for (int i = 0; i < newMessages.count ; i++)
                                                  {
                                                      [insertIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
                                                  }
                                                  
                                                  [self.theTableView insertRowsAtIndexPaths:insertIndexPaths withRowAnimation:UITableViewRowAnimationMiddle];
                                                  
-                                                 NSLog(@"New messages: %@", newMessages);
+                                              //   NSLog(@"New messages: %@", newMessages);
+                                                 
+                                                 [self configureStatusLabel];
+
                                              }
-                                             else if ([[responseObject objectForKey:@"Status"] intValue] == -1 ) //Session invalidated
+                                             else if ([[responseObject objectForKey:@"Status"] intValue] == -100 ) //Session invalidated
                                              {
                                                  //Return to Login Screen
                                                  UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"[Dev Note]You have been logged out. Perhaps you logged in a different device. or your session timed out. Pressing okay will send you to the login page" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
@@ -126,7 +142,6 @@
 
   
     
-    [self configureStatusLabel];
 }
 
 -(void)configureStatusLabel
@@ -149,7 +164,7 @@
     
     NSString *update = [NSString stringWithFormat:@"Updated: %@ %@", [dateForm stringFromDate:now], [formatter stringFromDate:now]];
     
-    //        NSString *update = [NSString stringWithFormat:@"Updated: %@", MyString];
+    // NSString *update = [NSString stringWithFormat:@"Updated: %@", MyString];
     
     self.statusLabel.text =  update;
     [self.statusLabel sizeToFit];
@@ -192,8 +207,13 @@
     // Do any additional setup after loading the view from its nib.
     
     //Set up the screen navigation bar
-    self.title = @"Inbox";
-    self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    if (self.messageType != MessageTypeDeleted)
+    {
+        self.navigationItem.rightBarButtonItem = self.editButtonItem;
+
+    }
+    
+    
     UIBarButtonItem *menuButton = [[UIBarButtonItem alloc] initWithTitle:@"Menu"
                                                                    style:UIBarButtonItemStyleBordered
                                                                   target:self
@@ -237,7 +257,6 @@
     //We can download the user's contacts and stuff with a method in here. It should do it on a different thread obviously.
     //getContacts(user.sessionTokenString) sends post and recieve an array of Contact Objects.
     
-  
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     
     if (!self.currentUser) {
@@ -246,12 +265,11 @@
         self.currentUser.emailAddress = [userDefaults objectForKey:@"emailAddress"];
     }
     
-    NSLog(@"Called ViewDidLoad!! - Right before Params %@ %@ %@", self.currentUser.sessionToken, self.currentUser.emailAddress, self.currentUser.name);
+  //  NSLog(@"Called ViewDidLoad!! - Right before Params %@ %@ %@", self.currentUser.sessionToken, self.currentUser.emailAddress, self.currentUser.name);
 
-    
-    [self getEmails];
-    [self getContacts];
-    
+  
+        [self getEmails];
+        [self getContacts];
 
      
 
@@ -259,8 +277,27 @@
 
 - (void)getEmails
 {
-    NSDictionary *params = [NSDictionary dictionaryWithObject:self.currentUser.sessionToken forKey:@"sessionToken"];
+//    NSLog(@"Get-Emails was called");
+//    
+//
+//
+//    if (self.messageType == MessageTypeInbox)
+//    {
+//        messageType = MessageTypeInbox;
+//        NSLog(@"set to inbox");
+//    }
+//    else if (self.messageType == MessageTypeDeleted)
+//    {
+//        messageType = MessageTypeDeleted;
+//        NSLog(@"set to delete");
+//    }
+//    NSLog(@"messageType: %d", messageType);
     
+    NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:
+                            self.currentUser.sessionToken , @"sessionToken",
+                            [NSNumber numberWithInt:self.messageType], @"messageType", nil];
+    
+
     [[PikuZoneAPIClient sharedInstance] postPath:@"GetMessages.ashx"
                                       parameters:params
                                          success:^(AFHTTPRequestOperation *operation, id responseObject) {
@@ -275,26 +312,31 @@
                                                  
                                                  for (NSDictionary *singleMessageDict in completeMessageDict) {
                                                      Message *message = [[Message alloc] initWithMessageDictionary:singleMessageDict];
+                                                     NSLog(@"Message ID: %i", message.messageID);
+                                                     if (message.read) {
+                                                         NSLog(@"Is Read!");
+                                                     } else NSLog(@"Not Read!");
                                                      
                                                      [self.emailArray addObject:message];
                                                  }
                                                  
                                                  [theTableView reloadData];
                                              }
-                                             else if ([[responseObject objectForKey:@"Status"] intValue] == -1 ) //Session invalidated
+                                             else if ([[responseObject objectForKey:@"Status"] intValue] == -100 ) //Session invalidated
                                              {
                                                  //Return to Login Screen
-                                                 NSLog(@"Return o logonvc");
+                                               //  NSLog(@"Return to logonvc");
                                                  UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"[Dev Note]You have been logged out. Perhaps you logged in a different device. or your session timed out. Pressing okay will send you to the login page" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
                                                  [alert show];
                                                  
                                              }
                                          } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
                                              //failure
-                                             NSLog(@"%@", [error localizedDescription]);
-                                             
+                                           //  NSLog(@"%@", [error localizedDescription]);
+                                             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:[error localizedDescription] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                                             [alert show];
                                          }];
-    
+
 }
 
 - (void)getContacts
@@ -338,14 +380,14 @@
                                                                 
                                                      } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
                                                          //Handle Failure
-                                                         NSLog(@"%@", [error localizedDescription]);
+                                                       //  NSLog(@"%@", [error localizedDescription]);
 
                                                      }];
                 
                 
                 [self.contactArray addObject:contact];
             }
-        } else if ([[responseObject objectForKey:@"Status"] intValue] == -1 ) //Session invalidated
+        } else if ([[responseObject objectForKey:@"Status"] intValue] == -100 ) //Session invalidated
         {
             //Return to Login Screen - Handled above in getEmail since that's called in first. 
             
@@ -362,16 +404,7 @@
 
 }
 
-#pragma mark UIAlertViewDelegate Methods
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    if (buttonIndex == alertView.cancelButtonIndex) {
-        AppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
-        [appDelegate presentLoginViewController];
-    }
-
-}
 
 - (void)viewDidUnload
 {
@@ -417,11 +450,27 @@
     UILabel *senderLabel = (UILabel *)[cell viewWithTag:kSenderLabel];
     UILabel *titleLabel = (UILabel *)[cell viewWithTag:kTitleLabel];
     UILabel *previewLabel = (UILabel *)[cell viewWithTag:kEmailDetailLabel];
+    UIImageView *readView = (UIImageView *)[cell viewWithTag:kReadTag];
     
     
     
     Message *email = [self.emailArray objectAtIndex:indexPath.row];
-//    
+//
+    
+    if (self.messageType == MessageTypeDeleted || self.messageType == MessageTypeSent)
+    {
+
+    }
+    
+    if (self.messageType == MessageTypeInbox)
+    {
+        if (!email.read)
+        {
+            readView.alpha = 1;
+        }
+    }
+
+    
     senderLabel.text = email.senderName;
     titleLabel.text = email.subject;
     previewLabel.text = email.messageBody;
@@ -436,6 +485,16 @@
 //    // Configure the cell and custom content
 //        cell.textLabel.text = email.subject;
     
+
+//        UIView *selectionView = [[UIView alloc]initWithFrame:cell.bounds];
+//        
+//        [selectionView setBackgroundColor:LIGHTGREEN];
+//        
+//        cell.selectedBackgroundView = selectionView;
+    
+    cell.selectionStyle = UITableViewCellSelectionStyleGray;
+        
+    
     return cell;
 }
 
@@ -449,19 +508,48 @@
  */
 
 
-// Override to support editing the table view.
+ //Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source.
-        [self.emailArray removeObjectAtIndex:indexPath.row];
-        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    //Only let you delete if MessageTypeDeleted isn't on. 
+    if (self.messageType != MessageTypeDeleted) {
+        if (editingStyle == UITableViewCellEditingStyleDelete) {
+            //Put it in the deleted inbox here.
+            
+            //Get message Id
+            Message *selectedEmail = [self.emailArray objectAtIndex:indexPath.row];
+
+            //Get sessiontoken
+            
+            //Create params
+            NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:
+                                           self.currentUser.sessionToken, @"SessionToken",
+                                           [NSNumber numberWithInt:selectedEmail.messageID], @"MessageId" , nil];
+            
+            [[PikuZoneAPIClient sharedInstance] postPath:@"deletemessage.ashx" parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
+                //Handle success
+                // Delete the row from the data source.
+               // NSLog(@"delete response: %@", responseObject);
+                [self.emailArray removeObjectAtIndex:indexPath.row];
+                [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+                
+                        
+            } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+                NSLog(@"%@", [error localizedDescription]);
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Unable to delete on server" message:[error localizedDescription] delegate:self cancelButtonTitle:nil otherButtonTitles:@"Okay",nil];
+                [alert show];
+            }];
+            
+    
+            
+        } else if (editingStyle == UITableViewCellEditingStyleInsert) {
+            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
+        }
         
-        //Put it in the deleted inbox here. 
-        
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
-    }   
+    } else {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"Message already deleted" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+    }
 }
 
 
@@ -481,27 +569,51 @@
  }
  */
 
+
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    //    if (!self.detailViewController) {
-    //        self.detailViewController = [[MMDetailViewController alloc] initWithNibName:@"MMDetailViewController" bundle:nil];
-    //    }
-    //    [self.navigationController pushViewController:self.detailViewController animated:YES];
-    
     Message *selectedEmail = [self.emailArray objectAtIndex:indexPath.row];
-    
-    EmailDetailViewController *emailDetailViewController = [[EmailDetailViewController alloc] init];
-    emailDetailViewController.email = selectedEmail;
-//    emailDetailViewController.contactArray = [[NSMutableArray alloc] init];
-    emailDetailViewController.contactArray = self.contactArray;
-    
-    NSLog(@"Subject: %@", selectedEmail.subject);
-    
+
+    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+    UIImageView *readView = (UIImageView *)[cell viewWithTag:kReadTag];
+    readView.alpha = 0;
+        
+    self.emailDetailViewController = [[EmailDetailViewController alloc] initWithNibName:@"EmailDetailViewController" bundle:nil];
+    self.emailDetailViewController.email = selectedEmail;
+    self.emailDetailViewController.currentUser = self.currentUser;
+    self.emailDetailViewController.contactArray = self.contactArray;
+
+  //  NSLog(@"Subject: %@", selectedEmail.subject);
+
+    if (!selectedEmail.read)
+    {
+        //Mark it as read on the server
+
+        NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:
+                                self.currentUser.sessionToken, @"SessionToken",
+                                [NSNumber numberWithInt:selectedEmail.messageID], @"MessageId", nil];
+
+        [[PikuZoneAPIClient sharedInstance] postPath:@"readmessage.ashx" parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
+            //Handle success
+          //  NSLog(@"read resp: %@", responseObject);
+
+            if ([[responseObject objectForKey:@"Status"] intValue] == 0) {
+                //Message is now read on server
+                selectedEmail.read = YES;
+            } 
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            //Handle failure
+            NSLog(@"%@", [error localizedDescription]);
+        }];
+    }
     [self.theTableView deselectRowAtIndexPath:indexPath animated:YES];
     [self.navigationController pushViewController:emailDetailViewController animated:YES];
+    
 }
 
 -(void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    
     [super setEditing:editing animated:animated];
     [theTableView setEditing:editing animated:animated];
 }
@@ -513,10 +625,7 @@
 // private
 
 - (UIViewController*)composeTo:(NSString*)recipient {
-    //    TTTableTextItem* item = [TTTableTextItem itemWithText:@"Cousin" URL:nil];
-    //    
-    //    TTTableTextItem* item2 = [TTTableTextItem itemWithText:@"Papa" URL:nil];
-    //    
+  
     
     TTMessageController* controller = [[TTMessageController alloc] initWithRecipients:nil];
     controller.navigationBarTintColor = [UIColor colorWithRed:0 green:100/255.f blue:0 alpha:1.0];
@@ -531,28 +640,12 @@
 
 
 - (void)cancelAddressBook {
-    //    [[TTNavigator navigator].visibleViewController dismissModalViewControllerAnimated:YES];
-    //    [self.navigationController dismissModalViewControllerAnimated:YES];
+
     [self.presentingViewController  dismissViewControllerAnimated:YES completion:nil];
     
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// NSObject
-
-//- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-//    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
-//        _sendTimer = nil;
-//        
-//        [[TTNavigator navigator].URLMap from:@"tt://compose?to=(composeTo:)"
-//                       toModalViewController:self selector:@selector(composeTo:)];
-//        
-//        [[TTNavigator navigator].URLMap from:@"tt://post"
-//                            toViewController:self selector:@selector(post:)];
-//    }
-//    return self;
-//}
 
 - (void)dealloc {
     [[TTNavigator navigator].URLMap removeURL:@"tt://compose?to=(composeTo:)"];
@@ -575,7 +668,7 @@
 //     forControlEvents:UIControlEventTouchUpInside];
 //    button.frame = CGRectMake(20, 20, appFrame.size.width - 40, 50);
 //    [self.view addSubview:button];
-//    
+//
 //    UIButton* button2 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
 //    [button2 setTitle:@"Show TTPostController" forState:UIControlStateNormal];
 //    [button2 addTarget:@"tt://post" action:@selector(openURLFromButton:)
@@ -585,7 +678,7 @@
 //}
 
 //- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-//    return TTIsSupportedOrientation(interfaceOrientation);
+//   return TTIsSupportedOrientation(interfaceOrientation);
 //}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -598,7 +691,7 @@
                                                 selector:@selector(sendDelayed:) 
                                                 userInfo:fields 
                                                  repeats:NO];
-    NSLog(@"Some messages are about to be sent");
+   // NSLog(@"Controller did send Field: Some messages are about to be sent");
     
 }
 
@@ -608,26 +701,70 @@
     NSArray* fields = timer.userInfo;
     
     TTMessageSubjectField *subjectField = [fields objectAtIndex:1];
-    NSLog(@"Subject: %@", subjectField.text);
+   // NSLog(@"Subject: %@", subjectField.text);
     
     TTMessageTextField *messageBodyField = [fields objectAtIndex:2];
-    NSLog(@"Message Body: %@", messageBodyField.text);
+   // NSLog(@"Message Body: %@", messageBodyField.text);
     
     
     RecipientViewController *rvc = [[RecipientViewController alloc] initWithStyle:UITableViewStylePlain contacts:self.contactArray];
-
+    
+    NSMutableString *recipientString = [[NSMutableString alloc] initWithCapacity:5];
+    
     TTMessageRecipientField* toField = [fields objectAtIndex:0];
+    BOOL secondplusgo = NO;
     for (NSString *name in toField.recipients) {
+        if (secondplusgo) { [recipientString appendString:@","]; }
         
-        //Get the actual recipient class: 
+        //Get the actual recipient class:
         Contact *recipient = [rvc getRecipientForName:name];
-        NSLog(@"Name: %@, Id: %i", recipient.name, recipient.contactID);
-        
+      //  NSLog(@"Name: %@, Id: %i", recipient.name, recipient.contactID);
+        [recipientString appendString:[NSString stringWithFormat:@"%i", recipient.contactID]];
+        secondplusgo = YES;
     }
+    
+    
+ //   NSLog(@"recipient string: %@",  recipientString);
+#pragma mark - WIll SEND MESSAGES HERE
     // Will do the sending of a message RIGHT HEREREERERERERE
     
-
-    [self.modalViewController dismissModalViewControllerAnimated:YES];
+    NSDictionary *sendMessageParams = [NSDictionary dictionaryWithObjectsAndKeys:
+                                       self.currentUser.sessionToken, @"SessionToken",
+                                       recipientString, @"Recipients",
+                                       subjectField.text, @"Subject",
+                                       messageBodyField.text, @"Body", nil];
+    
+   // NSLog(@"%@", sendMessageParams);
+    
+    [[PikuZoneAPIClient sharedInstance] postPath:@"sendmessage.ashx" parameters:sendMessageParams
+                                         success:^(AFHTTPRequestOperation *operation, id responseObject) {
+                                             
+                                             if ([[responseObject objectForKey:@"Status"] intValue] == 0)
+                                             {
+                                                 
+                                               //  NSLog(@"resp: %@", responseObject);
+                                                 lastMessageErred = NO;
+                                                 [self.modalViewController dismissModalViewControllerAnimated:YES];
+                                             }
+                                             else {
+                                                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error in sending this message" message:[responseObject objectForKey:@"Message"] delegate:self cancelButtonTitle:nil otherButtonTitles:@"Okay", nil];
+                                                 [alert show];
+                                             }
+                                             
+                                             
+                                             
+                                         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+                                             NSLog(@"%@", [error localizedDescription]);
+                                             sendingErrorAlert = [[UIAlertView alloc] initWithTitle:@"Error in sending this message" message:[error localizedDescription] delegate:self cancelButtonTitle:nil otherButtonTitles:@"Okay", nil];
+                                             savedMessageBodyTextFromError = messageBodyField.text;
+                                             savedTitleTextFromError = subjectField.text;
+                                             lastMessageErred = YES;
+                                             [sendingErrorAlert   show];
+                                             
+                                         }];
+    
+    
+    
 }
 
 
@@ -643,31 +780,11 @@
 
 - (void)composeControllerShowRecipientPicker:(TTMessageController*)controller {
     
-//    WE ARENT USING THE SEARCH TEST controller AT ATLL
-    
-    //Will make MY own view and place it here...
-    //    
-//    SearchTestController* searchController = [[SearchTestController alloc] init];
-//    searchController.delegate = self;
-//    searchController.title = @"Family Book";
-//    searchController.navigationItem.prompt = @"Select a recipient";
-    //    searchController.navigationItem.rightBarButtonItem =
-    //    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-    //                                                  target:self action:@selector()];
-    
-    //    UINavigationController* navController = [[UINavigationController alloc] init];
-    //    [navController pushViewController:searchController animated:NO];
-    
-    
-    //    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Test" message:@"Control" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles: nil];
-    //    [alert show];
-    
-    
+
+    //Here we use the contact array we got from the GetContacts method and send it to the recipientsController. And will be used as the datasource.
+
     RecipientViewController *recipientController = [[RecipientViewController alloc] initWithStyle:UITableViewStylePlain contacts:self.contactArray];
-    
-    //Here we use the contact array we got from the GetContacts method and send it to the recipientsController. And will be used as the datasource. 
-    
-    
+
     recipientController.delegate = self;
     recipientController.title = @"Family Book";
     recipientController.navigationItem.prompt = @"Select a recipient";
@@ -678,26 +795,11 @@
     
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// SearchTestControllerDelegate
-
-//- (void)searchTestController:(SearchTestController*)controller didSelectObject:(id)object {
-//    NSLog(@"Supposed to be the search");
-//    //I need a reference to the TTMessage Controller
-//    
-//    
-//    TTMessageController* composeController = (TTMessageController*)controller;//controller.navigationController ;// self.navigationController.topViewController ;
-//    NSLog(@"Del Cont: %@", [self.mainMessageController class]);
-//    
-//    [self.mainMessageController addRecipient:object forFieldAtIndex:0];
-//    [controller dismissModalViewControllerAnimated:YES];
-//}
-
 
 
 #pragma mark - Recipient View Controller Delegate
 - (void)recipientViewController:(RecipientViewController*)controller didSelectRecipient:(Contact *)recipient {
-    NSLog(@"Selected %@ id: %i", recipient.name, recipient.contactID);
+   // NSLog(@"Selected %@ id: %i", recipient.name, recipient.contactID);
     
 //    TTMessageController* composeController = (TTMessageController*)controller;//controller.navigationController ;// self.navigationController.topViewController ;
 //    NSLog(@"Del Cont: %@", [self.mainMessageController class]);
@@ -709,7 +811,8 @@
 
 
 
-- (void)recipientViewControllerdidCancel:(SearchTestController*)controller {
+- (void)recipientViewControllerdidCancel:(SearchTestController*)controller
+{
     [controller dismissModalViewControllerAnimated:YES];
 }
 
@@ -732,24 +835,43 @@
     self.mainMessageController = (TTMessageController *)[self composeTo:nil];
     self.mainMessageController.delegate = self;
     
+    if (lastMessageErred) {
+        [self.mainMessageController setSubject:savedTitleTextFromError];
+        [self.mainMessageController setBody:savedMessageBodyTextFromError];
+    }
+    
     
     UINavigationController *messageNavController = [[UINavigationController alloc] initWithRootViewController:self.mainMessageController];
     
     //  [[TTNavigator navigator].visibleViewController presentModalViewController:messageComp animated:YES];
     [self presentModalViewController:messageNavController animated:YES];
-    //    [self.navigationController pushViewController:messageComp animated:YES];
-    
-    
-    //    UIButton* button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    //    [button setTitle:@"Show TTMessageController" forState:UIControlStateNormal];
-    //    [button addTarget:@"tt://compose?to=Alan%20Jones" action:@selector(openURL)
-    //     forControlEvents:UIControlEventTouchUpInside];
-    //    button.frame = CGRectMake(20, 20, appFrame.size.width - 40, 50);
-    //    [self.view addSubview:button];
-    
-    
+
 }
 
+
+#pragma mark UIAlertViewDelegate Methods
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
+    if([title isEqualToString:@"OK"])  {
+        //Do nothing...
+        return;
+    }
+    
+    if (buttonIndex == alertView.cancelButtonIndex) {
+        AppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+        [appDelegate presentLoginViewController];
+    }
+    
+    if (alertView == sendingErrorAlert ) {
+        //Will be nice to reload that messageController page with the same details instead of seding him back..
+       
+        [self.mainMessageController removeActivityView];
+        
+    }
+    
+}
 
 
 @end

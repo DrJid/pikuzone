@@ -8,7 +8,8 @@
 
 #import "PikuZoneAPIClient.h"
 
-#define PikuZoneAPIBaseURLString @"http://dm1.catchwind.com/pikuzone/ws/"
+#define PikuZoneAPIBaseURLString @"https://www.pikuzone.com/ws/"
+//@"http://dm1.catchwind.com/pikuzone/ws/"
 #define PikuZoneAPIToken @"1234bcde"
 
 @implementation PikuZoneAPIClient

@@ -13,6 +13,7 @@
 #import "SearchTestController.h"
 #import "RecipientViewController.h"
 #import "BarButtonMethods.h"
+#import "User.h"
 
 @interface EmailDetailViewController : UIViewController <TTMessageControllerDelegate, RecipientViewControllerDelegate>
 
@@ -22,7 +23,7 @@
 @property (weak, nonatomic) IBOutlet UITableView *theTableView;
 @property(nonatomic, strong) NSTimer* sendTimer;
 @property(nonatomic, strong) TTMessageController *mainMessageController;
-
+@property (nonatomic, strong) User *currentUser;
 @property (nonatomic, strong) NSMutableArray *contactArray;
 
 

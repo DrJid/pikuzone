@@ -8,6 +8,10 @@
 
 #import "MenuViewController.h"
 #import "AppDelegate.h"
+#import "InboxViewController.h"
+
+
+
 #define InboxRow 0
 #define DeletedRow 1
 #define SentRow 2
@@ -15,6 +19,8 @@
 
 
 @implementation MenuViewController
+
+@synthesize currentUser, inboxViewController;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -45,20 +51,11 @@
  
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    
-    UIBarButtonItem *backToInbox = [[UIBarButtonItem alloc] initWithTitle:@"Inbox"
-                                                                   style:UIBarButtonItemStyleBordered
-                                                                  target:self
-                                                                  action:@selector(backToInbox:)];
-    self.navigationItem.leftBarButtonItem = backToInbox;
-}
 
-- (void) backToInbox:(id)sender
-{
-    [self dismissModalViewControllerAnimated:YES];    
-    
-}
+    self.title = @"Menu";
+    self.view.backgroundColor = [UIColor colorWithRed:240/255.f green:241/255.f blue:206/255.f alpha:1];
 
+}
 
 
 - (void)viewDidUnload
@@ -121,6 +118,9 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     
+    cell.selectionStyle = UITableViewCellSelectionStyleGray;
+
+    
     // Configure the cell...
     if (indexPath.row == InboxRow) {
         cell.textLabel.text = @"Inbox";
@@ -138,7 +138,7 @@
     }
     
     else if (indexPath.row == LogOutRow) {
-        cell.textLabel.text = @"Logout (Development)";
+        cell.textLabel.text = @"Logout";
         cell.textLabel.textAlignment = UITextAlignmentCenter;
     }
     
@@ -191,18 +191,32 @@
 
 
     
-    if (indexPath.row == InboxRow) {
-        [self dismissModalViewControllerAnimated:YES];
+    if (indexPath.row == InboxRow)
+    {
+        [self.navigationController pushViewController:self.inboxViewController animated:YES];
     }
     
     else if (indexPath.row == DeletedRow) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Go to Delete View" message:@"test message" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
-        [alert show];
+
+        
+        //Create a clone of the InboxViewController. But fill it with Deleted Messages instead.
+        InboxViewController *deletedMessagesViewController = [[InboxViewController alloc] initWithNibName:@"InboxViewController" bundle:nil];
+        deletedMessagesViewController.currentUser = self.currentUser;
+        deletedMessagesViewController.messageType = MessageTypeDeleted;
+        deletedMessagesViewController.title = @"Deleted";
+        [self.navigationController pushViewController:deletedMessagesViewController animated:YES];
+
+        
     }
     
-    else if (indexPath.row  == SentRow) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Go to Sent View" message:@"test message" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
-        [alert show];
+    else if (indexPath.row  == SentRow)
+    {
+        InboxViewController *sentMessagesViewController = [[InboxViewController alloc] initWithNibName:@"InboxViewController" bundle:nil];
+        sentMessagesViewController.currentUser = self.currentUser;
+        sentMessagesViewController.messageType = MessageTypeSent;
+        sentMessagesViewController.title = @"Sent";
+        [self.navigationController pushViewController:sentMessagesViewController animated:YES];
+
     }
     
     else if (indexPath.row == LogOutRow) {

@@ -10,6 +10,7 @@
 #import "InboxViewController.h"
 #import "PikuZoneAPIClient.h"
 #import "ActivityView.h"
+#import "MenuViewController.h"
 
 @implementation LoginViewController
 @synthesize usernameField;
@@ -69,7 +70,7 @@
                                                  self.currentUser.userID = [[responseObject objectForKey:@"UserId"] intValue];
                                                  self.currentUser.sessionToken = [responseObject objectForKey:@"SessionToken"];
                                                  self.currentUser.emailAddress = [responseObject objectForKey:@"EmailAddress"];
-                                                 NSLog(@"Current User name: %@", self.currentUser.name);
+                                              //   NSLog(@"Current User name: %@", self.currentUser.name);
                                                  
 
                                                  NSString *title = [NSString stringWithFormat:@"Welcome %@!", self.currentUser.name];
@@ -80,13 +81,19 @@
                                                  [alert show];
                                                  
 
-                                                     InboxViewController *inboxViewController = [[InboxViewController alloc] initWithNibName:@"InboxViewController" bundle:nil];
-                                                 
+                                                 MenuViewController *menuViewController = [[MenuViewController alloc] initWithNibName:@"MenuViewController" bundle:nil];
+                                                 menuViewController.inboxViewController = [[InboxViewController alloc] initWithNibName:@"InboxViewController" bundle:nil];
                                                  
                                                  //Pass the User object we get from the authenticate method into the inboxviewController.
-                                                     inboxViewController.currentUser = self.currentUser;
+                                                 menuViewController.currentUser = self.currentUser;
+                                                 menuViewController.inboxViewController.currentUser = self.currentUser;
+                                                 menuViewController.inboxViewController.title = @"Inbox";
+                                                 menuViewController.inboxViewController.messageType = MessageTypeInbox;
                                                  
-                                                     UINavigationController *mainNavigationController = [[UINavigationController alloc] initWithRootViewController:inboxViewController];
+                                                 
+                                                     UINavigationController *mainNavigationController = [[UINavigationController alloc] initWithRootViewController:menuViewController];
+                                                 
+                                                 [mainNavigationController pushViewController:menuViewController.inboxViewController animated:NO];
                                                  
                                                      [self.navigationController presentModalViewController:mainNavigationController animated:YES];
 //                                                 [self.navigationController pushViewController:inboxViewController animated:YES];
@@ -109,9 +116,7 @@
                                                  [alert show];
                                                  [activityView.activityIndicator stopAnimating];
                                                  [activityView removeFromSuperview];
-                                                 [usernameField becomeFirstResponder];
-                                                 
-                                                 
+                                                 [usernameField becomeFirstResponder];                                                                                                  
                                              }
                                                                                           
 
@@ -120,8 +125,12 @@
 
                                          } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
                                              //handle failure
-                                             NSLog(@"ERROR");
-                                             NSLog(@"%@", [error localizedDescription]);
+                                             //NSLog(@"%@", [error localizedDescription]);
+                                             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login Failed" message:[error localizedDescription] delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
+                                             [alert show];
+                                             [activityView.activityIndicator stopAnimating];
+                                             [activityView removeFromSuperview];
+                                             [usernameField becomeFirstResponder];                                             
                                          }];
 
     
@@ -165,10 +174,10 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     
-    self.title = @"Login";
+ self.title = @"Login";
     
-    usernameField.text = @"Kid1";
-    passwordField.text = @"Password1";
+  //  usernameField.text = @"Kid1";
+   // passwordField.text = @"Password1";
 
 //    NSString *name = [[NSUserDefaults standardUserDefaults] objectForKey:@"name"];
 //    NSString *email = [[NSUserDefaults standardUserDefaults] objectForKey:@"emailAddress"];
@@ -199,6 +208,19 @@
 }
 
 
-
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+	if (textField == self.usernameField) {
+		[passwordField becomeFirstResponder];
+	}
+	if (textField == self.passwordField) {
+		[passwordField resignFirstResponder];
+       // NSLog(@"Password field");
+        [self authenticate:nil];
+		//[self processFieldEntries];
+	}
+    
+	return YES;
+}
 
 @end

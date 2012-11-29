@@ -10,6 +10,7 @@
 #import "MockDataSource.h"
 #import "SearchTestController.h"
 #import <Three20UI/UIViewAdditions.h>
+#import "PikuZoneAPIClient.h"
 
 
 #define FromRow     0
@@ -22,6 +23,7 @@
 @synthesize sendTimer = _sendTimer;
 @synthesize mainMessageController;
 @synthesize contactArray;
+@synthesize currentUser;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -57,7 +59,7 @@
     UIBarButtonItem *spaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 //    UIBarButtonItem *fixedSpaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     
-    UIBarButtonItem *deleteItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:nil];
+//    UIBarButtonItem *deleteItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteMessage)];
     
     UIBarButtonItem *compose = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(composeNewMessage:)];
     
@@ -65,11 +67,13 @@
     
     UIBarButtonItem *replyButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemReply target:self action:@selector(replyAction:)];
     
-    NSArray *toolbarItems = [NSArray arrayWithObjects:refreshAction, spaceItem, deleteItem, spaceItem, replyButton, spaceItem, compose, nil];
+    NSArray *toolbarItems = [NSArray arrayWithObjects:refreshAction, spaceItem, replyButton, spaceItem, compose, nil];
     
     [self setToolbarItems:toolbarItems animated:YES];
 
+    NSLog(@"Email Body: %@", email.messageBody);
     
+ 
 }
 
 - (void)viewDidUnload
@@ -134,15 +138,21 @@
 #pragma mark - TableView methods
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
     if (indexPath.row == EmailRow) {
         
         CGSize emailSize = [email.messageBody sizeWithFont:[UIFont systemFontOfSize:16] constrainedToSize:CGSizeMake(320, 480) lineBreakMode:UILineBreakModeWordWrap];
         
 //        NSLog(@"Size: %f", emailSize.height * 1.2);
-        if (emailSize.height * 1.2 < 300 ) {
-            return 300;
-        }
-        return emailSize.height * 1.2;
+
+        int webViewHeight = MAX( emailSize.height - 88 , self.view.frame.size.height - 88);
+
+//        if (emailSize.height * 1.2 < 300 ) {
+//            return 300;
+//        }
+//        return emailSize.height * 1.2;
+        
+        return webViewHeight;
     }
     else return 44;
 }
@@ -221,19 +231,27 @@
         
         CGSize emailSize = [email.messageBody sizeWithFont:[UIFont systemFontOfSize:16] constrainedToSize:CGSizeMake(320, 480) lineBreakMode:UILineBreakModeWordWrap];
                 
-        UITextView *bodyTextView = [[UITextView alloc] initWithFrame:CGRectMake(5, 5, 310, emailSize.height + 100)];
+       // UITextView *bodyTextView = [[UITextView alloc] initWithFrame:CGRectMake(5, 5, 310, emailSize.height + 100)];
         
-        bodyTextView.text = email.messageBody;
-        bodyTextView.font = [UIFont systemFontOfSize:16]; // [UIFont fontWithName:@"Cochin" size:16];
-        bodyTextView.editable = NO;
+//        bodyTextView.text = email.messageBody;
+        //bodyTextView.font = [UIFont systemFontOfSize:16]; // [UIFont fontWithName:@"Cochin" size:16];
+      //  bodyTextView.editable = NO;
+        
+        int webViewHeight = MAX( emailSize.height + 100, self.view.frame.size.height);
+        
+        if (webViewHeight == emailSize.height + 100) {
+            NSLog(@"Returning emailSize");
+        } else NSLog(@"Returning framehight");
+        
+        UIWebView *messageWebView = [[UIWebView alloc] initWithFrame:CGRectMake(5, 5, 310, webViewHeight)];
+        [messageWebView loadHTMLString:email.messageBody baseURL:nil];
+        //    self.messageBodyWebView.scalesPageToFit = YES;
+//        [self.messageBodyWebView loadHTMLString:email.messageBody baseURL:nil];
+        
+        
+        [cell.contentView addSubview:messageWebView];
+        
 
-        
-        [cell.contentView addSubview:bodyTextView];
-        
-        
-
-
-        
         return cell;
     }    
 
