@@ -140,8 +140,6 @@
                                              
                                          }];
 
-  
-    
 }
 
 -(void)configureStatusLabel
@@ -312,9 +310,9 @@
                                                  
                                                  for (NSDictionary *singleMessageDict in completeMessageDict) {
                                                      Message *message = [[Message alloc] initWithMessageDictionary:singleMessageDict];
-                                                     NSLog(@"Message ID: %i", message.messageID);
+                                                    // NSLog(@"Message ID: %i", message.messageID);
                                                      if (message.read) {
-                                                         NSLog(@"Is Read!");
+                                                        // NSLog(@"Is Read!");
                                                      } else NSLog(@"Not Read!");
                                                      
                                                      [self.emailArray addObject:message];
@@ -326,7 +324,7 @@
                                              {
                                                  //Return to Login Screen
                                                //  NSLog(@"Return to logonvc");
-                                                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"[Dev Note]You have been logged out. Perhaps you logged in a different device. or your session timed out. Pressing okay will send you to the login page" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
+                                                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"Uh-oh. Looks like you have been logged out. Perhaps you logged in with a different device or your session timed out. Pressing okay will send you to the login page to log back in again" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
                                                  [alert show];
                                                  
                                              }

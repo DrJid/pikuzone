@@ -49,7 +49,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     
-    self.title = self.email.subject;    
+    self.title = self.email.subject;
     self.theTableView.allowsSelection = NO;
     
     
@@ -57,9 +57,9 @@
     
     
     UIBarButtonItem *spaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-//    UIBarButtonItem *fixedSpaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    //    UIBarButtonItem *fixedSpaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     
-//    UIBarButtonItem *deleteItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteMessage)];
+    //    UIBarButtonItem *deleteItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteMessage)];
     
     UIBarButtonItem *compose = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(composeNewMessage:)];
     
@@ -70,10 +70,10 @@
     NSArray *toolbarItems = [NSArray arrayWithObjects:refreshAction, spaceItem, replyButton, spaceItem, compose, nil];
     
     [self setToolbarItems:toolbarItems animated:YES];
-
-    NSLog(@"Email Body: %@", email.messageBody);
     
- 
+   // NSLog(@"Email Body: %@", email.messageBody);
+    
+    
 }
 
 - (void)viewDidUnload
@@ -82,7 +82,7 @@
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
-
+    
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -101,17 +101,17 @@
     
     self.mainMessageController.delegate = self;
     NSString *replyTitle = [NSString stringWithFormat:@"Re: %@", email.subject];
-    self.mainMessageController.subject = replyTitle;  
+    self.mainMessageController.subject = replyTitle;
     self.mainMessageController.title = replyTitle;
-
- 
+    
+    
     UINavigationController *messageNavController = [[UINavigationController alloc] initWithRootViewController:self.mainMessageController];
     
     //  [[TTNavigator navigator].visibleViewController presentModalViewController:messageComp animated:YES];
     //    [self.navigationController pushViewController:messageComp animated:YES];
- 
+    
     [self presentModalViewController:messageNavController animated:YES];
-
+    
     
     [self.mainMessageController.bodyField setSelectedRange:NSMakeRange(0, 0)];
     
@@ -121,17 +121,17 @@
     
     [self.mainMessageController.bodyField setSelectedRange:NSMakeRange(0, 0)];
     
-////    
-//    [self.mainMessageController.scrollView setContentOffset:CGPointMake(0,0) animated:NO];
-//    
-//        [self.mainMessageController.scrollView scrollRectToVisible:CGRectMake(0, 0, 0, 0) animated:NO];
+    ////
+    //    [self.mainMessageController.scrollView setContentOffset:CGPointMake(0,0) animated:NO];
+    //
+    //        [self.mainMessageController.scrollView scrollRectToVisible:CGRectMake(0, 0, 0, 0) animated:NO];
     
     
 }
 
 - (IBAction)refreshAction:(id)sender {
     BarButtonMethods *bbm = [[BarButtonMethods alloc] init];
-    [bbm refreshAction]; 
+    [bbm refreshAction];
 }
 
 
@@ -143,14 +143,14 @@
         
         CGSize emailSize = [email.messageBody sizeWithFont:[UIFont systemFontOfSize:16] constrainedToSize:CGSizeMake(320, 480) lineBreakMode:UILineBreakModeWordWrap];
         
-//        NSLog(@"Size: %f", emailSize.height * 1.2);
-
+        //        NSLog(@"Size: %f", emailSize.height * 1.2);
+        
         int webViewHeight = MAX( emailSize.height - 88 , self.view.frame.size.height - 88);
-
-//        if (emailSize.height * 1.2 < 300 ) {
-//            return 300;
-//        }
-//        return emailSize.height * 1.2;
+        
+        //        if (emailSize.height * 1.2 < 300 ) {
+        //            return 300;
+        //        }
+        //        return emailSize.height * 1.2;
         
         return webViewHeight;
     }
@@ -183,7 +183,7 @@
         
         
         CGRect frame=CGRectMake(10,2, 80, 40);
-        UILabel *label1 = [[UILabel alloc]init];            
+        UILabel *label1 = [[UILabel alloc]init];
         label1.frame=frame;
         label1.textColor = [UIColor grayColor];
         label1.minimumFontSize = 8;
@@ -191,24 +191,24 @@
         label1.tag = 1001;
         [cell.contentView addSubview:label1];
         
-    
+        
         CGRect frame2=CGRectMake(60,2, 200, 40);
-        UILabel *label2 = [[UILabel alloc]init];            
+        UILabel *label2 = [[UILabel alloc]init];
         label2.frame=frame2;
-//        label2.textColor = [UIColor grayColor];
+        //        label2.textColor = [UIColor grayColor];
         label2.minimumFontSize = 7;
         label2.text=email.senderName;
         label2.tag = 1002;
         [cell.contentView addSubview:label2];
         
-//        
-//        
-//        
-//        cell.textLabel.text = @"From:";
-//        cell.textLabel.minimumFontSize = 8;
-//        cell.textLabel.textColor = [UIColor grayColor];
-//        cell.textLabel.numberOfLines = 1;
-//        cell.textLabel.adjustsFontSizeToFitWidth = YES;
+        //
+        //
+        //
+        //        cell.textLabel.text = @"From:";
+        //        cell.textLabel.minimumFontSize = 8;
+        //        cell.textLabel.textColor = [UIColor grayColor];
+        //        cell.textLabel.numberOfLines = 1;
+        //        cell.textLabel.adjustsFontSizeToFitWidth = YES;
         
         return cell;
     }
@@ -217,8 +217,8 @@
     else if (indexPath.row == SubjectRow) {
         
         CGRect frame=CGRectMake(12,10, 310, 20);
-
-        UILabel *subjectLabel = [[UILabel alloc]init];            
+        
+        UILabel *subjectLabel = [[UILabel alloc]init];
         subjectLabel.frame=frame;
         subjectLabel.font = [UIFont systemFontOfSize:15];
         subjectLabel.text=email.subject;
@@ -230,31 +230,31 @@
     else if (indexPath.row == EmailRow) {
         
         CGSize emailSize = [email.messageBody sizeWithFont:[UIFont systemFontOfSize:16] constrainedToSize:CGSizeMake(320, 480) lineBreakMode:UILineBreakModeWordWrap];
-                
-       // UITextView *bodyTextView = [[UITextView alloc] initWithFrame:CGRectMake(5, 5, 310, emailSize.height + 100)];
         
-//        bodyTextView.text = email.messageBody;
+        // UITextView *bodyTextView = [[UITextView alloc] initWithFrame:CGRectMake(5, 5, 310, emailSize.height + 100)];
+        
+        //        bodyTextView.text = email.messageBody;
         //bodyTextView.font = [UIFont systemFontOfSize:16]; // [UIFont fontWithName:@"Cochin" size:16];
-      //  bodyTextView.editable = NO;
+        //  bodyTextView.editable = NO;
         
         int webViewHeight = MAX( emailSize.height + 100, self.view.frame.size.height);
-        
-        if (webViewHeight == emailSize.height + 100) {
-            NSLog(@"Returning emailSize");
-        } else NSLog(@"Returning framehight");
+//        
+//        if (webViewHeight == emailSize.height + 100) {
+//            NSLog(@"Returning emailSize");
+//        } else NSLog(@"Returning framehight");
         
         UIWebView *messageWebView = [[UIWebView alloc] initWithFrame:CGRectMake(5, 5, 310, webViewHeight)];
         [messageWebView loadHTMLString:email.messageBody baseURL:nil];
         //    self.messageBodyWebView.scalesPageToFit = YES;
-//        [self.messageBodyWebView loadHTMLString:email.messageBody baseURL:nil];
+        //        [self.messageBodyWebView loadHTMLString:email.messageBody baseURL:nil];
         
         
         [cell.contentView addSubview:messageWebView];
         
-
+        
         return cell;
-    }    
-
+    }
+    
     return cell;
 }
 
@@ -276,7 +276,7 @@
  [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
  } else if (editingStyle == UITableViewCellEditingStyleInsert) {
  // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
- }   
+ }
  }
  */
 
@@ -315,9 +315,9 @@
 
 - (UIViewController*)composeTo:(NSString*)recipient {
     //    TTTableTextItem* item = [TTTableTextItem itemWithText:@"Cousin" URL:nil];
-    //    
-//        TTTableTextItem* item2 = [TTTableTextItem itemWithText:@"Papa" URL:nil];
-    //    
+    //
+    //        TTTableTextItem* item2 = [TTTableTextItem itemWithText:@"Papa" URL:nil];
+    //
     NSArray *recipients = [NSArray arrayWithObjects:recipient, nil];
     
     
@@ -347,10 +347,10 @@
 //- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
 //    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
 //        _sendTimer = nil;
-//        
+//
 //        [[TTNavigator navigator].URLMap from:@"tt://compose?to=(composeTo:)"
 //                       toModalViewController:self selector:@selector(composeTo:)];
-//        
+//
 //        [[TTNavigator navigator].URLMap from:@"tt://post"
 //                            toViewController:self selector:@selector(post:)];
 //    }
@@ -371,14 +371,14 @@
 //    CGRect appFrame = [UIScreen mainScreen].applicationFrame;
 //    self.view = [[UIView alloc] initWithFrame:appFrame];
 //    self.view.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1];;
-//    
+//
 //    UIButton* button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
 //    [button setTitle:@"Show TTMessageController" forState:UIControlStateNormal];
 //    [button addTarget:@"tt://compose?to=Alan%20Jones" action:@selector(openURL)
 //     forControlEvents:UIControlEventTouchUpInside];
 //    button.frame = CGRectMake(20, 20, appFrame.size.width - 40, 50);
 //    [self.view addSubview:button];
-//    
+//
 //    UIButton* button2 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
 //    [button2 setTitle:@"Show TTPostController" forState:UIControlStateNormal];
 //    [button2 addTarget:@"tt://post" action:@selector(openURLFromButton:)
@@ -395,12 +395,12 @@
 // TTMessageControllerDelegate
 
 - (void)composeController:(TTMessageController*)controller didSendFields:(NSArray*)fields {
-    _sendTimer = [NSTimer scheduledTimerWithTimeInterval:2 
+    _sendTimer = [NSTimer scheduledTimerWithTimeInterval:2
                                                   target:self
-                                                selector:@selector(sendDelayed:) userInfo:fields 
+                                                selector:@selector(sendDelayed:) userInfo:fields
                                                  repeats:NO];
-    NSLog(@"Some messages are about to be sent");
-
+    //NSLog(@"Some messages are about to be sent");
+    
 }
 
 - (void)sendDelayed:(NSTimer*)timer {
@@ -409,19 +409,19 @@
     NSArray* fields = timer.userInfo;
     
     TTMessageSubjectField *subjectField = [fields objectAtIndex:1];
-    NSLog(@"Subject: %@", subjectField.text);
+   // NSLog(@"Subject: %@", subjectField.text);
     
     TTMessageTextField *messageBodyField = [fields objectAtIndex:2];
-    NSLog(@"Message Body: %@", messageBodyField.text);
+    //NSLog(@"Message Body: %@", messageBodyField.text);
     
     RecipientViewController *rvc = [[RecipientViewController alloc] initWithStyle:UITableViewStylePlain contacts:self.contactArray];
     
     TTMessageRecipientField* toField = [fields objectAtIndex:0];
     for (NSString *name in toField.recipients) {
         
-        //Get the actual recipient class: 
+        //Get the actual recipient class:
         Contact *recipient = [rvc getRecipientForName:name];
-        NSLog(@"Name: %@, Email: %@", recipient.name, recipient.email);
+        //NSLog(@"Name: %@, Email: %@", recipient.name, recipient.email);
         
     }
     
@@ -433,7 +433,7 @@
 
 
 - (void)composeControllerWillCancel:(TTMessageController *)controller {
-    NSLog(@"It's about to cancel");
+    //NSLog(@"It's about to cancel");
 }
 
 - (void)composeControllerDidCancel:(TTMessageController*)controller {
@@ -441,18 +441,18 @@
     _sendTimer = nil;
     
     [controller dismissModalViewControllerAnimated:YES];
-    NSLog(@"Called it");
+    //NSLog(@"Called it");
 }
 
 - (void)composeControllerShowRecipientPicker:(TTMessageController*)controller {
     
     
-    //Will make MY own view and place it here... 
-    //    
-//    SearchTestController* searchController = [[SearchTestController alloc] init];
-//    searchController.delegate = self;
-//    searchController.title = @"Family Book";
-//    searchController.navigationItem.prompt = @"Select a recipient";
+    //Will make MY own view and place it here...
+    //
+    //    SearchTestController* searchController = [[SearchTestController alloc] init];
+    //    searchController.delegate = self;
+    //    searchController.title = @"Family Book";
+    //    searchController.navigationItem.prompt = @"Select a recipient";
     //    searchController.navigationItem.rightBarButtonItem =
     //    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
     //                                                  target:self action:@selector()];
@@ -486,7 +486,7 @@
 //    //I need a reference to the TTMessage Controller
 //
 //    NSLog(@"Del Cont: %@", [self.mainMessageController class]);
-//    
+//
 //    [self.mainMessageController addRecipient:object forFieldAtIndex:0];
 //    [controller dismissModalViewControllerAnimated:YES];
 //}
@@ -496,22 +496,22 @@
 //- (void)recipientViewController:(RecipientViewController*)controller didSelectObject:(id)object {
 //    NSLog(@"Supposed to be the search");
 //    //I need a reference to the TTMessage Controller
-//    
-//    
+//
+//
 //    TTMessageController* composeController = (TTMessageController*)controller;//controller.navigationController ;// self.navigationController.topViewController ;
 //    NSLog(@"Del Cont: %@", [self.mainMessageController class]);
-//    
+//
 //    [self.mainMessageController addRecipient:object forFieldAtIndex:0];
 //    [controller dismissModalViewControllerAnimated:YES];
 //}
 
 
 - (void)recipientViewController:(RecipientViewController*)controller didSelectRecipient:(Contact *)recipient {
-    NSLog(@"Selected %@ email address: %@", recipient.name, recipient.email);    
+    //NSLog(@"Selected %@ email address: %@", recipient.name, recipient.email);
     
     //    TTMessageController* composeController = (TTMessageController*)controller;//controller.navigationController ;// self.navigationController.topViewController ;
     //    NSLog(@"Del Cont: %@", [self.mainMessageController class]);
-    //    
+    //
     NSString *recipientName = recipient.name;
     [self.mainMessageController addRecipient:recipientName forFieldAtIndex:0];
     [controller dismissModalViewControllerAnimated:YES];

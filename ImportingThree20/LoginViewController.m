@@ -61,7 +61,7 @@
                                       parameters:params
                                          success:^(AFHTTPRequestOperation *operation, id responseObject) {
                                              //HAndle success
-//                                             NSLog(@"Response!!!!!!: %@", responseObject);
+                                             //                                             NSLog(@"Response!!!!!!: %@", responseObject);
                                              if ([[responseObject objectForKey:@"Status"] intValue] == 1) //Login Successful
                                              {
                                                  //Create new user object
@@ -70,9 +70,9 @@
                                                  self.currentUser.userID = [[responseObject objectForKey:@"UserId"] intValue];
                                                  self.currentUser.sessionToken = [responseObject objectForKey:@"SessionToken"];
                                                  self.currentUser.emailAddress = [responseObject objectForKey:@"EmailAddress"];
-                                              //   NSLog(@"Current User name: %@", self.currentUser.name);
+                                                 //   NSLog(@"Current User name: %@", self.currentUser.name);
                                                  
-
+                                                 
                                                  NSString *title = [NSString stringWithFormat:@"Welcome %@!", self.currentUser.name];
                                                  
                                                  [activityView.activityIndicator stopAnimating];
@@ -80,7 +80,7 @@
                                                  UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:self.currentUser.emailAddress delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
                                                  [alert show];
                                                  
-
+                                                 
                                                  MenuViewController *menuViewController = [[MenuViewController alloc] initWithNibName:@"MenuViewController" bundle:nil];
                                                  menuViewController.inboxViewController = [[InboxViewController alloc] initWithNibName:@"InboxViewController" bundle:nil];
                                                  
@@ -91,14 +91,14 @@
                                                  menuViewController.inboxViewController.messageType = MessageTypeInbox;
                                                  
                                                  
-                                                     UINavigationController *mainNavigationController = [[UINavigationController alloc] initWithRootViewController:menuViewController];
+                                                 UINavigationController *mainNavigationController = [[UINavigationController alloc] initWithRootViewController:menuViewController];
                                                  
                                                  [mainNavigationController pushViewController:menuViewController.inboxViewController animated:NO];
                                                  
-                                                     [self.navigationController presentModalViewController:mainNavigationController animated:YES];
-//                                                 [self.navigationController pushViewController:inboxViewController animated:YES];
-//                                                 [self.presentingViewController dismissModalViewControllerAnimated:YES];
-//                                                 [self.navigationController pushViewController:inboxViewController animated:NO];
+                                                 [self.navigationController presentModalViewController:mainNavigationController animated:YES];
+                                                 //                                                 [self.navigationController pushViewController:inboxViewController animated:YES];
+                                                 //                                                 [self.presentingViewController dismissModalViewControllerAnimated:YES];
+                                                 //                                                 [self.navigationController pushViewController:inboxViewController animated:NO];
                                                  
                                                  
                                                  
@@ -106,7 +106,7 @@
                                                  [[NSUserDefaults standardUserDefaults] setObject:self.currentUser.emailAddress forKey:@"emailAddress"];
                                                  [[NSUserDefaults standardUserDefaults] setObject:self.currentUser.name forKey:@"name"];
                                                  [[NSUserDefaults standardUserDefaults] setObject:self.currentUser.sessionToken forKey:@"sessionToken"];
-
+                                                 
                                                  
                                                  
                                                  
@@ -116,13 +116,13 @@
                                                  [alert show];
                                                  [activityView.activityIndicator stopAnimating];
                                                  [activityView removeFromSuperview];
-                                                 [usernameField becomeFirstResponder];                                                                                                  
+                                                 [usernameField becomeFirstResponder];
                                              }
-                                                                                          
-
+                                             
+                                             
                                              //You could do more stuff in here while it's logging you?
                                              //Tear down the view
-
+                                             
                                          } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
                                              //handle failure
                                              //NSLog(@"%@", [error localizedDescription]);
@@ -130,23 +130,23 @@
                                              [alert show];
                                              [activityView.activityIndicator stopAnimating];
                                              [activityView removeFromSuperview];
-                                             [usernameField becomeFirstResponder];                                             
+                                             [usernameField becomeFirstResponder];
                                          }];
-
     
     
-//    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Test Alert" message:message delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
-//    [alert show];
+    
+    //    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Test Alert" message:message delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
+    //    [alert show];
     
     
-//    InboxViewController *inboxViewController = [[InboxViewController alloc] initWithNibName:@"InboxViewController" bundle:nil];
+    //    InboxViewController *inboxViewController = [[InboxViewController alloc] initWithNibName:@"InboxViewController" bundle:nil];
     
-    //Pass the username object we get from the authenticate method into the inboxviewController. 
-//    inboxViewController.username = username;
+    //Pass the username object we get from the authenticate method into the inboxviewController.
+    //    inboxViewController.username = username;
     
-//    UINavigationController *mainNavigationController = [[UINavigationController alloc] initWithRootViewController:inboxViewController];
-        
-//    [self.navigationController presentModalViewController:mainNavigationController animated:YES];
+    //    UINavigationController *mainNavigationController = [[UINavigationController alloc] initWithRootViewController:inboxViewController];
+    
+    //    [self.navigationController presentModalViewController:mainNavigationController animated:YES];
     
 }
 
@@ -157,34 +157,34 @@
 {
     self.view.backgroundColor = [UIColor colorWithRed:240/255.f green:241/255.f blue:206/255.f alpha:1];
     
-//    //Resign First Responder
-//    UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self.usernameField action:@selector(resignFirstResponder)];
-//    UITapGestureRecognizer *gestureRecognizer2 = [[UITapGestureRecognizer alloc] initWithTarget:self.passwordField action:@selector(resignFirstResponder)];
-//    
+    //    //Resign First Responder
+    //    UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self.usernameField action:@selector(resignFirstResponder)];
+    //    UITapGestureRecognizer *gestureRecognizer2 = [[UITapGestureRecognizer alloc] initWithTarget:self.passwordField action:@selector(resignFirstResponder)];
+    //
     
     //Why do we need this again? tto make it possible tap on anything else in teh screen. Otherwise it wouldn't really recognize the tap of the other buttons!!! This might be the reason why some of your button don't do what they are supposed to do after adding a gesture recognizer onto the view. Rmember!!!
-//    gestureRecognizer.cancelsTouchesInView = NO;
-//    gestureRecognizer2.cancelsTouchesInView = NO;
-//    [self.view addGestureRecognizer:gestureRecognizer];
-//    [self.view addGestureRecognizer:gestureRecognizer2];
-//
-//    [self.view endEditing:YES];
+    //    gestureRecognizer.cancelsTouchesInView = NO;
+    //    gestureRecognizer2.cancelsTouchesInView = NO;
+    //    [self.view addGestureRecognizer:gestureRecognizer];
+    //    [self.view addGestureRecognizer:gestureRecognizer2];
+    //
+    //    [self.view endEditing:YES];
     [usernameField becomeFirstResponder];
-
+    
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     
- self.title = @"Login";
+    self.title = @"Login";
     
-  //  usernameField.text = @"Kid1";
-   // passwordField.text = @"Password1";
-
-//    NSString *name = [[NSUserDefaults standardUserDefaults] objectForKey:@"name"];
-//    NSString *email = [[NSUserDefaults standardUserDefaults] objectForKey:@"emailAddress"];
-//    NSString *st = [[NSUserDefaults standardUserDefaults] objectForKey:@"sessionToken"];
-//    NSString *msg = [NSString stringWithFormat:@" %@ %@ %@", name, email, st];
-//    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Test Alert" message:msg delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
-//    [alert show];
+    //  usernameField.text = @"Kid1";
+    // passwordField.text = @"Password1";
+    
+    //    NSString *name = [[NSUserDefaults standardUserDefaults] objectForKey:@"name"];
+    //    NSString *email = [[NSUserDefaults standardUserDefaults] objectForKey:@"emailAddress"];
+    //    NSString *st = [[NSUserDefaults standardUserDefaults] objectForKey:@"sessionToken"];
+    //    NSString *msg = [NSString stringWithFormat:@" %@ %@ %@", name, email, st];
+    //    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Test Alert" message:msg delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
+    //    [alert show];
 }
 
 - (void)viewDidUnload
@@ -215,7 +215,7 @@
 	}
 	if (textField == self.passwordField) {
 		[passwordField resignFirstResponder];
-       // NSLog(@"Password field");
+        // NSLog(@"Password field");
         [self authenticate:nil];
 		//[self processFieldEntries];
 	}

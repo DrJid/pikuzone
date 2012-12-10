@@ -219,6 +219,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		16259174167575C300394FFD /* Reachability.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		16259175167575C300394FFD /* Reachability.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		163DD398159E484600F89F30 /* Contact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Contact.h; sourceTree = "<group>"; };
 		163DD399159E484600F89F30 /* Contact.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Contact.m; sourceTree = "<group>"; };
 		163DD39B159E4A2200F89F30 /* baby.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = baby.jpg; path = ImportingThree20/baby.jpg; sourceTree = "<group>"; };
@@ -508,6 +510,8 @@
 		16B40BB615D0477A0036BCBC /* Helper Classes */ = {
 			isa = PBXGroup;
 			children = (
+				16259174167575C300394FFD /* Reachability.h */,
+				16259175167575C300394FFD /* Reachability.m */,
 				16EEB2BF15CC9929009C38C8 /* ActivityView.h */,
 				16EEB2C015CC9929009C38C8 /* ActivityView.m */,
 				165E542515A243D700066F64 /* Message.h */,
